@@ -1,0 +1,344 @@
+// use prisma-8
+
+// ======================================================
+// ENUMS
+// ======================================================
+
+enum Role {
+  ORGANIZER
+  PROVIDER
+  ADMIN
+}
+
+enum EventStatus {
+  DRAFT
+  PUBLISHED
+  CONFIRMED
+  COMPLETED
+  CANCELLED
+}
+
+enum PricingType {
+  FIXED
+  PER_HOUR
+  PER_GUEST
+  CUSTOM
+}
+
+enum AvailabilityStatus {
+  AVAILABLE
+  UNAVAILABLE
+  BOOKED
+}
+
+enum BookingStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+  CANCELLED
+  COMPLETED
+}
+
+
+// ======================================================
+// USERS
+// ======================================================
+
+model User {
+  id           String  @id @default(uuid())
+  firstName    String
+  lastName     String
+  email        String  @unique
+  passwordHash String
+  phone        String?
+  avatarUrl    String?
+  role         Role
+  isActive     Boolean @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt temporal.updatedAt()
+
+  // Relations
+  providerProfile  ProviderProfile?
+  events           Event[]
+  messages         Message[]
+  organizerReviews Review[] @relation("OrganizerReviews")
+}
+
+
+// ======================================================
+// PROVIDER PROFILES
+// ======================================================
+
+model ProviderProfile {
+  id String @id @default(uuid())
+
+  userId String @unique
+  user   User
+    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  businessName String
+  description  String?
+  location     String
+  websiteUrl   String?
+  verified     Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt temporal.updatedAt()
+
+  // Relations
+  services     ProviderService[]
+  availability ProviderAvailability[]
+  reviews      Review[]
+}
+
+
+// ======================================================
+// SERVICE CATEGORIES
+// ======================================================
+
+model ServiceCategory {
+  id          String @id @default(uuid())
+  name        String @unique
+  description String?
+  iconUrl     String?
+
+  createdAt DateTime @default(now())
+  updatedAt temporal.updatedAt()
+
+  // Relations
+  providerServices      ProviderService[]
+  eventRequiredServices EventRequiredService[]
+}
+
+
+// ======================================================
+// PROVIDER SERVICES
+// ======================================================
+
+model ProviderService {
+  id String @id @default(uuid())
+
+  providerId String
+  provider   ProviderProfile
+    @relation(fields: [providerId], references: [id], onDelete: Cascade)
+
+  categoryId String
+  category   ServiceCategory
+    @relation(fields: [categoryId], references: [id])
+
+  name        String
+  description String?
+
+  price       Decimal
+  pricingType PricingType
+
+  isActive Boolean @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt temporal.updatedAt()
+
+  // Relations
+  bookings Booking[]
+
+  @@index([providerId])
+  @@index([categoryId])
+}
+
+
+// ======================================================
+// EVENTS
+// ======================================================
+
+model Event {
+  id String @id @default(uuid())
+
+  organizerId String
+  organizer   User
+    @relation(fields: [organizerId], references: [id], onDelete: Cascade)
+
+  title       String
+  eventType   String
+  description String?
+
+  eventDate DateTime
+
+  location   String
+  guestCount Int
+  budget     Decimal
+
+  status EventStatus @default(DRAFT)
+
+  createdAt DateTime @default(now())
+  updatedAt temporal.updatedAt()
+
+  // Relations
+  requiredServices EventRequiredService[]
+  bookings         Booking[]
+
+  @@index([organizerId])
+  @@index([eventDate])
+}
+
+
+// ======================================================
+// SERVICES REQUIRED BY EVENTS
+// ======================================================
+
+model EventRequiredService {
+  id String @id @default(uuid())
+
+  eventId String
+  event   Event
+    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  categoryId String
+  category   ServiceCategory
+    @relation(fields: [categoryId], references: [id])
+
+  budget Decimal?
+  notes  String?
+
+  createdAt DateTime @default(now())
+  updatedAt temporal.updatedAt()
+
+  @@unique([eventId, categoryId])
+  @@index([categoryId])
+}
+
+
+// ======================================================
+// PROVIDER AVAILABILITY
+// ======================================================
+
+model ProviderAvailability {
+  id String @id @default(uuid())
+
+  providerId String
+  provider   ProviderProfile
+    @relation(fields: [providerId], references: [id], onDelete: Cascade)
+
+  startDateTime DateTime
+  endDateTime   DateTime
+
+  status AvailabilityStatus @default(AVAILABLE)
+
+  createdAt DateTime @default(now())
+  updatedAt temporal.updatedAt()
+
+  @@index([providerId])
+  @@index([startDateTime])
+}
+
+
+// ======================================================
+// BOOKINGS
+// ======================================================
+
+model Booking {
+  id String @id @default(uuid())
+
+  eventId String
+  event   Event
+    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  providerServiceId String
+  providerService   ProviderService
+    @relation(fields: [providerServiceId], references: [id])
+
+  status BookingStatus @default(PENDING)
+
+  agreedPrice Decimal?
+
+  organizerMessage String?
+  providerMessage  String?
+
+  createdAt DateTime @default(now())
+  updatedAt temporal.updatedAt()
+
+  // Relations
+  conversation Conversation?
+  review       Review?
+
+  @@index([eventId])
+  @@index([providerServiceId])
+}
+
+
+// ======================================================
+// CHAT CONVERSATIONS
+// ======================================================
+
+model Conversation {
+  id String @id @default(uuid())
+
+  bookingId String @unique
+  booking   Booking
+    @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt temporal.updatedAt()
+
+  // Relations
+  messages Message[]
+}
+
+
+// ======================================================
+// CHAT MESSAGES
+// ======================================================
+
+model Message {
+  id String @id @default(uuid())
+
+  conversationId String
+  conversation   Conversation
+    @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+
+  senderId String
+  sender   User
+    @relation(fields: [senderId], references: [id], onDelete: Cascade)
+
+  content String
+
+  isRead Boolean @default(false)
+
+  createdAt DateTime @default(now())
+
+  @@index([conversationId])
+  @@index([senderId])
+  @@index([createdAt])
+}
+
+
+// ======================================================
+// REVIEWS
+// ======================================================
+
+model Review {
+  id String @id @default(uuid())
+
+  bookingId String @unique
+  booking   Booking
+    @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+
+  organizerId String
+  organizer   User
+    @relation(
+      "OrganizerReviews",
+      fields: [organizerId],
+      references: [id]
+    )
+
+  providerId String
+  provider   ProviderProfile
+    @relation(fields: [providerId], references: [id])
+
+  rating  Int
+  comment String?
+
+  createdAt DateTime @default(now())
+  updatedAt temporal.updatedAt()
+
+  @@index([providerId])
+}

@@ -1,0 +1,18 @@
+services:
+  database:
+    image: postgres:17
+    container_name: eventmatch-postgres
+
+    environment:
+      POSTGRES_USER: eventmatch
+      POSTGRES_PASSWORD: eventmatch_dev
+      POSTGRES_DB: eventmatch
+
+    ports:
+      - "5433:5432"
+
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:

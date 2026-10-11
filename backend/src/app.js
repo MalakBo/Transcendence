@@ -1,5 +1,6 @@
 import express from "express";
 import cors from "cors";
+import providerRoutes from "./modules/providers/provider.routes.js";
 
 const app = express();
 
@@ -14,5 +15,8 @@ app.get("/api/health", (req, res) => {
     message: "EventMatch API is running 🚀"
   });
 });
+
+// Provider routes
+app.use("/api/providers", providerRoutes);
 
 export default app;

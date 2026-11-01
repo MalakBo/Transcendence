@@ -23,7 +23,6 @@ export const seedAdmin = async () => {
  
   if (existing) {
     if (existing.role === "ADMIN") {
-      console.log(`[seed] Admin already exists: ${email}`);
       return existing;
     }
     throw new Error(

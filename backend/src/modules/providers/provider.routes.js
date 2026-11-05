@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { getProviderById, createProvider, updateProvider } from "./provider.controller.js";
+import { createService } from "./providerService.controller.js";
 const router = Router();
 
 router.get("/", (req, res) => {
@@ -11,5 +12,6 @@ router.get("/", (req, res) => {
 router.get("/:id", getProviderById);
 router.post("/", createProvider);
 router.patch("/:id", updateProvider);
+router.post("/:providerId/services", createService);
 
 export default router;

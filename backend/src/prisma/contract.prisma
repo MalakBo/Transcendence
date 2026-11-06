@@ -46,10 +46,9 @@ enum BookingStatus {
 
 model User {
   id           String  @id @default(uuid())
-  firstName    String
-  lastName     String
+  name         String
   email        String  @unique
-  passwordHash String
+  password  String
   phone        String?
   avatarUrl    String?
   role         Role

@@ -7,8 +7,8 @@
     "test": "tests"
   },
   "scripts": {
-    "dev": "DOTENV_CONFIG_PATH=../.env nodemon src/server.js",
-    "start": "DOTENV_CONFIG_PATH=../.env node src/server.js",
+    "dev": "DOTENV_CONFIG_PATH=../.env nodemon src/start.js",
+    "start": "DOTENV_CONFIG_PATH=../.env node src/start.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "postinstall": "prisma skills sync || exit 0",
     "contract:emit": "prisma contract emit"
@@ -18,16 +18,22 @@
   "license": "ISC",
   "type": "module",
   "dependencies": {
+    "@js-temporal/polyfill": "^0.5.1",
     "@prisma/client": "^7.10.0",
     "@prisma/orm-postgres": "^8.0.0-rc.13",
+    "bcryptjs": "^3.0.3",
+    "cookie-parser": "^1.4.7",
     "cors": "^2.8.6",
     "dotenv": "^18.0.4",
-    "express": "^5.2.1"
+    "express": "^5.2.1",
+    "jsonwebtoken": "^9.0.3",
+    "temporal-polyfill": "^1.0.6"
   },
   "devDependencies": {
     "@prisma/cli-engine": "^0.6.1",
     "@types/node": "^26.6.3",
     "nodemon": "^3.1.14",
+    "prettier": "^3.9.10",
     "prisma": "^8.0.0-rc.17"
   }
 }

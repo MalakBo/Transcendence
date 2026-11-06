@@ -7,8 +7,8 @@
     "test": "tests"
   },
   "scripts": {
-    "dev": "nodemon src/server.js",
-    "start": "node src/server.js",
+    "dev": "nodemon src/start.js",
+    "start": "node src/start.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "postinstall": "prisma skills sync || exit 0",
     "contract:emit": "prisma contract emit"
@@ -18,6 +18,7 @@
   "license": "ISC",
   "type": "module",
   "dependencies": {
+    "@js-temporal/polyfill": "^0.5.1",
     "@prisma/client": "^7.10.0",
     "@prisma/orm-postgres": "^8.0.0-rc.13",
     "cors": "^2.8.6",

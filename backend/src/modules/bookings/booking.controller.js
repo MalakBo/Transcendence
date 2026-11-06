@@ -1,22 +1,47 @@
-export const getBookings = (req, res) => {
-  return res.status(200).json({
-    success: true,
-    message: "Booking API is working!",
-    bookings: []
-  });
+import {
+  getAllBookings,
+  createBooking as createBookingService
+} from "./booking.service.js";
+
+export const getBookings = async (req, res) => {
+  try {
+    const bookings = await getAllBookings();
+
+    return res.status(200).json({
+      success: true,
+      bookings
+    });
+  } catch (error) {
+    console.error("Error fetching bookings:", error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Failed to fetch bookings"
+    });
+  }
 };
 
-export const createBooking = (req, res) => {
-  const { eventId, providerServiceId, organizerMessage } = req.body;
+export const createBooking = async (req, res) => {
+  try {
+    const { eventId, providerServiceId, organizerMessage } = req.body;
 
-  return res.status(200).json({
-    success: true,
-    message: "Booking request received (not saved yet)",
-    booking: {
+    const booking = await createBookingService(
       eventId,
       providerServiceId,
-      organizerMessage: organizerMessage ?? null,
-      status: "PENDING"
-    }
-  });
+      organizerMessage
+    );
+
+    return res.status(201).json({
+      success: true,
+      message: "Booking created successfully",
+      booking
+    });
+  } catch (error) {
+    console.error("Error creating booking:", error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Failed to create booking"
+    });
+  }
 };

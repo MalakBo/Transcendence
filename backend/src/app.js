@@ -5,7 +5,8 @@ import providerRoutes from "./modules/profiles/provider.routes.js";
 import organiserRoutes from "./modules/profiles/organiser.routes.js";
 import 'temporal-polyfill/full/global'
 import cookieParser from "cookie-parser";
-import providerRoutes from "./modules/providers/provider.routes.js";
+
+
 
 
 
@@ -20,7 +21,7 @@ app.use(express.json());
 app.get("/api/health", (req, res) => {
   res.status(200).json({
     success: true,
-    message: "EventMatch API is running 🚀",
+    message: "EventMatch API is running ",
   });
 });
 

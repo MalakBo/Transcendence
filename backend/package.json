@@ -21,6 +21,7 @@
     "@prisma/client": "^7.10.0",
     "@prisma/orm-postgres": "^8.0.0-rc.13",
     "bcryptjs": "^3.0.3",
+    "cookie-parser": "^1.4.7",
     "cors": "^2.8.6",
     "dotenv": "^18.0.4",
     "express": "^5.2.1",

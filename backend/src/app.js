@@ -19,7 +19,7 @@ const app = express();
 // Middleware
 app.use(cors());
 // thats what enables express to parse incoming JSON into req.body
-app.use(cookieParser()); 
+app.use(cookieParser());
 app.use(express.json());
 // by basma
 app.use("/api/bookings", bookingRoutes);

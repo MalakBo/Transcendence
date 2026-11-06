@@ -4,7 +4,7 @@ import {
   hashPassword,
   normalizeEmail,
 } from "../auth/auth.utils.js";
- 
+
 const Users = db.orm.public.User;
 
 const readAdminConfig = () => ({
@@ -17,10 +17,10 @@ const readAdminConfig = () => ({
 
 export const seedAdmin = async () => {
   const config = readAdminConfig();
- 
+
   const email = config.email;
   const existing = await findUserByEmail(email);
- 
+
   if (existing) {
     if (existing.role === "ADMIN") {
       return existing;
@@ -36,7 +36,7 @@ export const seedAdmin = async () => {
     role: "ADMIN",
     isActive: true,
   });
- 
+
   console.log(`[seed] Admin created: ${email}`);
   return admin;
 };

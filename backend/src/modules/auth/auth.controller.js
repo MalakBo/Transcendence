@@ -43,7 +43,7 @@ const register = async (req, res) => {
   }
 
   //TO BE ADDED => checking if the fields (name, mail..) are valid
- 
+
   const user = await Users.create({
     name,
     email,

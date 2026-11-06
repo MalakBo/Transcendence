@@ -5,6 +5,7 @@ import providerRoutes from "./modules/profiles/provider.routes.js";
 import organiserRoutes from "./modules/profiles/organiser.routes.js";
 import 'temporal-polyfill/full/global'
 import cookieParser from "cookie-parser";
+import providerRoutes from "./modules/providers/provider.routes.js";
 
 
 
@@ -28,7 +29,7 @@ app.get("/api/health", (req, res) => {
 app.use("/auth", authRoutes);
 
 //Profiles routes
-app.use("/provider", providerRoutes);
+app.use("/api/providers", providerRoutes);
 app.use("/organiser", organiserRoutes);
 
 

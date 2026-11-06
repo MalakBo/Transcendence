@@ -24,6 +24,12 @@ export const getBookings = async (req, res) => {
 export const createBooking = async (req, res) => {
   try {
     const { eventId, providerServiceId, organizerMessage } = req.body;
+    if (!eventId || !providerServiceId) {
+  return res.status(400).json({
+    success: false,
+    message: "eventId and providerServiceId are required"
+  });
+}
 
     const booking = await createBookingService(
       eventId,

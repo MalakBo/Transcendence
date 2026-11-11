@@ -34,7 +34,8 @@ export const createBooking = async (req, res) => {
     const booking = await createBookingService(
       eventId,
       providerServiceId,
-      organizerMessage
+      organizerMessage,
+      req.user.id
     );
 
     return res.status(201).json({

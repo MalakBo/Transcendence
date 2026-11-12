@@ -1,5 +1,5 @@
 
-import { createProviderService } from "./providerService.service.js";
+import { createProviderService, getProviderServices, updateProviderService, deleteProviderService } from "./providerService.service.js";
 
 // CREATE PROVIDER SERVICE
 // POST /api/providers/:providerId/services
@@ -186,6 +186,152 @@ export async function createService(req, res) {
   } catch (error) {
     console.error("Error creating provider service:", error);
 
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    });
+  }
+}
+
+export async function getServices(req, res) {
+  try {
+    const { providerId } = req.params;
+    const result = await getProviderServices;
+    if(result.status === "provider_not_found")
+      return res.status(404).json({
+          success: false,
+          message: "Provider not found",
+    });
+    if(result.status !== "success") {
+      return res.status(500).json({
+        success: false,
+        message: "Unable to retrieve provider services",
+      });
+    }
+    return res.status(200).json({
+      success: true,
+      data: result.services,
+    });
+  } catch (error) {
+    console.error("Error getting provider services:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    });
+  }
+}
+// PATCH /api/providers/:providerId/services/:serviceId
+export async function updateService(req, res) {
+  try {
+    const { providerId, serviceId } = req.params;
+    
+    if(!req.user?.id) {
+      return res.status(401).json({
+        success: false,
+        message: "Authentication required",
+      });
+    }
+    const updates = req.body;
+    if(!updates || typeof updates !== "object" || Array.isArray(updates)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid request body",
+      });
+    }
+    const result = await updateProviderService(providerId, serviceId, req.user.id, updates);
+    if(result.status === "provider_not_found") {
+      return res.status(404).json({
+        success: false,
+        message: "Provider not found",
+      });
+    }
+    if(result.status === "service_not_found") {
+      return res.status(404).json({
+        success: false,
+        message: "Service not found",
+      });
+    }
+    if(result.status === "forbidden") {
+      return res.status(403).json({
+        success: false,
+        message: "You cannot update another provider's service",
+      });
+    }
+    const validationErrors = {
+      invalid_input: "No valid fields provided for update",
+      invalid_category: "Invalid category",
+      category_not_found: "Category not found",
+      invalid_name: "Invalid service name",
+      invalid_description: "Invalid description",
+      invalid_price: "Price must be a non-negative number",
+      invalid_pricing_type: "Invalid pricing type",
+    };
+    if(Object.prototype.hasOwnProperty.call(validationErrors, result.status)) {
+      return res.status(400).json({
+        success: false,
+        message: validationErrors[result.status],
+      });
+    }
+    if(result.status !== "success") {
+      return res.status(500).json({
+        success: false,
+        message: "Unable to update provider service",
+      });
+    }
+    return res.status(200).json({
+      success: true,
+      message: "Provider service updated successfully",
+      data: result.service,
+    });
+  } catch (error) {
+    console.error("Error updating provider service:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    });
+  }
+}
+// DELETE /api/providers/:providerId/services/:serviceId
+export async function deleteService(req, res) {
+  try {
+    const { providerId, serviceId } = req.params;
+    if(!req.user?.id) {
+      return res.status(401).json({
+        success: false,
+        message: "Authentication required",
+      });
+    }
+    const result = await deleteProviderService(providerId, serviceId, req.user.id);
+    if(result.status === "provider_not_found") {
+      return res.status(404).json({
+        success: false,
+        message: "Provider not found",
+      });
+    }
+    if(result.status === "service_not_found") {
+      return res.status(404).json({
+        success: false,
+        message: "Service not found",
+      });
+    }
+    if(result.status === "forbidden") {
+      return res.status(403).json({
+        success: false,
+        message: "You cannot delete another provider's service",
+      });
+    }
+    if(result.status !== "success") {
+      return res.status(500).json({
+        success: false,
+        message: "Unable to delete provider service",
+      });
+    }
+    return res.status(200).json({
+      success: true,
+      message: "Provider service deleted successfully",
+    });
+  } catch (error) {
+    console.error("Error deleting provider service:", error);
     return res.status(500).json({
       success: false,
       message: "Internal server error",

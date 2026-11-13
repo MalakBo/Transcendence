@@ -1,45 +1,44 @@
-.PHONY: all up down restart ps install dev backend frontend logs db-emit db-status db-shell
 
-all: up
-	$(MAKE) dev
+.PHONY: all up down restart build ps install dev backend frontend logs db-emit db-status db-shell
+
+all: dev
+
+build:
+	docker compose build
 
 up:
-	docker compose up -d
+	docker compose up --build -d
+
+dev:
+	docker compose up --build
 
 down:
 	docker compose down
 
 restart:
 	docker compose down
-	docker compose up -d
+	docker compose up --build -d
 
 ps:
 	docker compose ps
 
 install:
-	cd backend && npm install
-	cd frontend && npm install
-
-dev:
-	@trap 'kill 0' INT TERM EXIT; \
-	(cd backend && npm run dev) & \
-	(cd frontend && npm run dev) & \
-	wait
+	docker compose build
 
 backend:
-	cd backend && npm run dev
+	docker compose up --build backend
 
 frontend:
-	cd frontend && npm run dev
-
-db-emit:
-	cd backend && npx prisma contract emit
-
-db-status:
-	cd backend && npx prisma migration status
-
-db-shell:
-	docker exec -it eventmatch-postgres psql -U eventmatch -d eventmatch
+	docker compose up --build frontend
 
 logs:
 	docker compose logs -f
+
+db-emit:
+	docker compose exec backend npx prisma contract emit
+
+db-status:
+	docker compose exec backend npx prisma migration status
+
+db-shell:
+	docker compose exec database psql -U $${DB_USER} -d $${DB_NAME}

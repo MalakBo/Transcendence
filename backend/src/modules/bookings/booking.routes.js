@@ -1,7 +1,8 @@
 import express from "express";
 
 import { getBookings,
-         createBooking
+         createBooking,
+         updateBookingStatus
  } from "./booking.controller.js";
 
 
@@ -25,6 +26,13 @@ router.post(
     protect,
     authorizeRoles("ORGANIZER"),
     createBooking
+);
+
+router.patch(
+    "/:id/status",
+    protect,
+    authorizeRoles("PROVIDER"),
+    updateBookingStatus
 );
 // router.post("/", createBooking);
 

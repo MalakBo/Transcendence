@@ -1,6 +1,7 @@
 import {
   getAllBookings,
-  createBooking as createBookingService
+  createBooking as createBookingService,
+  updateBookingStatus as updateBookingStatusService
 } from "./booking.service.js";
 
 export const getBookings = async (req, res) => {
@@ -57,5 +58,39 @@ export const createBooking = async (req, res) => {
     //   success: false,
     //   message: "Failed to create booking"
     // });
+  }
+};
+
+export const updateBookingStatus = async(req, res) =>{
+  try{
+    const bookingId = req.params.id;
+    const {status, providerMessage } = req.body;
+    
+    if(!["ACCEPTED", "REJECTED"].includes(status)){
+      return res.status(400).json({
+        success: false,
+        message: "Status must be ACCEPTED or REJECTED"
+      });
+    }
+    const booking = await updateBookingStatusService(
+      bookingId,
+      status,
+      providerMessage,
+      req.user.id
+    );
+    return res.status(200).json({
+      sucess: true,
+      message: "Booking status updated successfully",
+      booking
+    });
+  }catch (error){
+    console.error("Error updating booking status:", error);
+
+    return res.status(error.statusCode || 500).json({
+      success: false,
+      message: error.statusCode
+      ? error.message
+      : "Failed to update booking status"
+    });
   }
 };

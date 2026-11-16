@@ -40,7 +40,7 @@ export async function createProviderProfile(userId, data) {
   });
   return { status: "success", provider: newProvider };
 }
-export async function updateProviderProfile(id, data) {
+export async function updateProviderProfile(providerId, userId, data) {
   const provider = await db.orm.public.ProviderProfile.where({ id: providerId })
     .select("id", "userId")
     .first();
@@ -60,11 +60,38 @@ export async function updateProviderProfile(id, data) {
     if (Object.keys(updateData).length === 0) {
       return { status: "invalid_input" };
     }
-    const updatedProvider = await db.orm.public.ProviderAvailability.where({ id: providerId, userId: userId })
+    const updatedProvider = await db.orm.public.ProviderProfile.where({ id: providerId, userId: userId })
       .select("id", "businessName", "description", "location", "websiteUrl", "verified")
       .update(updateData);
     if(!updatedProvider) {
       return { status: "not_found" };
     }
     return { status: "success", provider: updatedProvider };
+}
+// offset : how many data to skip before starting to fetch the next data.
+// limit : how many data to fetch in one request.
+// all : fetch all data.
+// slice : to get the data from the array (0 to limit).
+export async function findProviders(page = 1, limit = 10) {
+  const offset = (page - 1) * limit;
+
+  const providers = await db.orm.public.ProviderProfile.select(
+    "id",
+    "businessName",
+    "description",
+    "location",
+    "websiteUrl",
+    "verified"
+  )
+  .orderBy("id", "asc")
+  .offset(offset)
+  .limit(limit + 1)
+  .all();
+
+  const hasMore = providers.length > limit;
+
+  return {
+    providers: providers.slice(0, limit),
+    hasMore,
+  }
 }

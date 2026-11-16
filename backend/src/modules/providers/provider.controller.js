@@ -2,6 +2,7 @@ import {
   findProviderById,
   createProviderProfile,
   updateProviderProfile,
+  findProviders,
 } from "./provider.service.js";
 
 export async function getProviderById(req, res) {
@@ -116,7 +117,6 @@ export async function createProvider(req, res) {
 export async function updateProvider(req, res) {
   try {
     const { id } = req.params;
-    // 1. Check authentication
     if (req.user == null || req.user.id == null) {
       return res.status(401).json({
         success: false,
@@ -131,7 +131,6 @@ export async function updateProvider(req, res) {
         message: "Invalid request body",
       });
     }
-    // 3. Only allow these fields
     const allowedFields = [
       "businessName",
       "description",
@@ -245,6 +244,38 @@ export async function updateProvider(req, res) {
   } catch (error) {
     console.error("Error updating provider:", error);
 
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    });
+  }
+}
+
+export async function getProviders(req, res) {
+  try {
+    const page = Number(req.query.page ?? 1);
+    const limit = NUmber(req.query.limit ?? 10);
+
+    if(!NUmber.isSafeInteger(page) || page < 1 ||
+       !NUmber.isSafeInteger(limit) || limit < 1 || limit > 50) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid pagination. Page must be a positive integer and limit must be between 1 and 50.",
+      });
+    }
+
+    const result = await findProviders(page, limit);
+    return res.status(200).json({
+      success: true,
+      data: result.providers,
+      pagination: {
+        page,
+        limit,
+        total: result.total,
+      },
+    });
+  } catch (error) {
+    console.error("Error fetching providers:", error);
     return res.status(500).json({
       success: false,
       message: "Internal server error",

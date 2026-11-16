@@ -39,7 +39,7 @@ app.use("/auth", authRoutes);
 
 //Profiles routes
 app.use("/api/providers", providerRoutes);
-app.use("/api/provider-area", providerAreaRoutes);
+app.use("/provider-area", providerAreaRoutes);
 app.use("/organiser", organiserRoutes);
 
 

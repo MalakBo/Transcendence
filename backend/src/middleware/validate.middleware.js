@@ -22,3 +22,20 @@ export default function checkEvent(req, res, next) {
         });
     }
 }
+
+// validate data before update the data
+
+// export default function checkData(req, res, next) {
+//     try
+//     {
+//         if (!isNomemptyString(req.body.name) || )
+//             throw new Error("bad request");
+//     }
+//     catch (error)
+//     {
+//         return res.status(400).json({
+//             message : error.message
+//         });
+//     }
+
+// }

@@ -65,6 +65,6 @@ export async function listConversations(userId)
   return rows.map((c, i) => ({
     id: c.id,
     with: byId.get(otherIds[i]),
-    lastMessage: c.messages[0] ?? null,
+    lastMessage: c.messages.length ? c.messages[0] : null,
   }));
 }

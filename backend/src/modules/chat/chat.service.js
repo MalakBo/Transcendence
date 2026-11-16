@@ -43,6 +43,7 @@ export async function saveMessage(conversationId, userId, content)
 
 }
 
+///error 
 export async function listConversations(userId)
 {
   const rows = await db.conversation.findMany({

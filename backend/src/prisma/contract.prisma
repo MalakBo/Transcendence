@@ -269,17 +269,16 @@ model Booking {
 // ======================================================
 
 model Conversation {
-  id String @id @default(uuid())
-
-  bookingId String @unique
-  booking   Booking
-    @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  id         String @id @default(uuid())
+  userLowId  String
+  userHighId String
 
   createdAt DateTime @default(now())
   updatedAt temporal.updatedAt()
 
-  // Relations
   messages Message[]
+
+  @@unique([userLowId, userHighId])
 }
 
 

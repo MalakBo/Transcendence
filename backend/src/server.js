@@ -4,6 +4,7 @@ import { Server } from "socket.io";
 import app from "./app.js";
 import { connectDB } from "./modules/auth/auth.config.db.js";
 import { seedAdmin } from "./modules/profiles/seedAdmin.js";
+import { registerChat } from "./modules/chat/chat.socket.js";
 
 const PORT = process.env.PORT || 3000;
 
@@ -16,18 +17,7 @@ const io = new Server(httpServer, {
   },
 });
 
-io.on("connection", (socket) => {
-  console.log("connected:", socket.id);
-
-  socket.on("chat message", (msg) => {
-    console.log("received:", msg);
-    io.emit("chat message", msg);
-  });
-
-  socket.on("disconnect", () => {
-    console.log("disconnected:", socket.id);
-  });
-});
+registerChat(io);
 
 const start = async () => {
   try {

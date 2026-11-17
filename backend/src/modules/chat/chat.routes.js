@@ -1,5 +1,5 @@
 import { Router } from "express";
-import auth from "../../middleware/auth/auth.middleware.js";
+import { protect as auth } from "../profiles/auth.middleware.js";
 import * as c from "./chat.controller.js";
 
 const router = Router();

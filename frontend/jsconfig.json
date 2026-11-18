@@ -1,0 +1,8 @@
+//This file configures how JavaScript tools understand your project.
+{
+  "compilerOptions": {
+    "paths": {
+      "@/*": ["./*"]
+    }
+  }
+}

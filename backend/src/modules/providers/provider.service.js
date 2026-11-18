@@ -1,4 +1,5 @@
 import { db } from "../../prisma/db.ts";
+import { and } from "@prisma/orm-postgres/orm-client";
 
 export async function findProviderById(id) {
   const provider = await db.orm.public.ProviderProfile.where({ id })
@@ -72,10 +73,48 @@ export async function updateProviderProfile(providerId, userId, data) {
 // limit : how many data to fetch in one request.
 // all : fetch all data.
 // slice : to get the data from the array (0 to limit).
-export async function findProviders(page = 1, limit = 10) {
+export async function findProviders({ page = 1, limit = 10, location, search, category, minPrice, maxPrice }) {
   const offset = (page - 1) * limit;
+  let query = db.orm.public.ProviderProfile;
 
-  const providers = await db.orm.public.ProviderProfile.select(
+  if(location) {
+    query = query.where({ location });
+  }
+  if(search) {
+    query = query.where((p) => p.businessName.ilike(`%${search}%`));
+  }
+  let categoryId;
+  if(category) {
+    const matchingCategory = await db.orm.public.ServiceCategory
+      .where({ name: category })
+      .select("id")
+      .first();
+    if(!matchingCategory) {
+      return {
+        providers: [],
+        hasMore: false,
+      };
+    }
+    categoryId = matchingCategory.id;
+  }
+  if(categoryId !== undefined || minPrice !== undefined || maxPrice !== undefined) {
+    query = query.where((p) => p.services.some((service) => {
+      const conditions = [service.isActive.eq(true),];
+      if(categoryId !== undefined) {
+        conditions.push(service.categoryId.eq(categoryId));
+      }
+      if(minPrice !== undefined) {
+        conditions.push(service.price.gte(minPrice));
+      }
+      if(maxPrice !== undefined) {
+        conditions.push(service.price.lte(maxPrice));
+      }
+      return and(...conditions);
+    }));
+  }
+
+  const providers = await query
+  .select(
     "id",
     "businessName",
     "description",
@@ -83,15 +122,13 @@ export async function findProviders(page = 1, limit = 10) {
     "websiteUrl",
     "verified"
   )
-  .orderBy("id", "asc")
+  .orderBy((p) => p.id.asc())
   .offset(offset)
   .limit(limit + 1)
   .all();
 
-  const hasMore = providers.length > limit;
-
   return {
     providers: providers.slice(0, limit),
-    hasMore,
+    hasMore: providers.length > limit,
   }
 }

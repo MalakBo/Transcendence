@@ -5,7 +5,11 @@ import cors from "cors";
 // Think of app as the central object that organizes your backend's HTTP behavior.
 
 import authRoutes from "./modules/auth/auth.routes.js"
-import providerRoutes from "./modules/profiles/provider.routes.js";
+
+import eventRoutes from "./modules/events/event.routes.js";
+
+// import providerRoutes from "./modules/profiles/provider.routes.js";
+import providerRoutes from "./modules/providers/provider.routes.js";
 import organiserRoutes from "./modules/profiles/organiser.routes.js";
 import 'temporal-polyfill/full/global'
 import cookieParser from "cookie-parser";
@@ -39,6 +43,9 @@ app.use("/auth", authRoutes);
 //Profiles routes
 app.use("/api/providers", providerRoutes);
 app.use("/organiser", organiserRoutes);
+
+// Events routes
+app.use("/api/events", eventRoutes);
 
 
 export default app;

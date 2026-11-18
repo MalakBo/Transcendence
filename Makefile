@@ -23,7 +23,7 @@ wait-db:
 	@echo "PostgreSQL is ready!"
 
 down:
-	docker compose down
+	docker compose down -v
 
 restart:
 	docker compose down

@@ -14,24 +14,28 @@ import {
 } from "../profiles/auth.middleware.js"
 
 
-
 // to create my router dedicated to booking and it manages only booking endpoints
 const router = express.Router();
 
-router.get("/", getBookings);
+router.get(
+    "/",
+    protect,
+    authorizeRoles("ORGANIZER", "PROVIDER"),
+    getBookings
+);
 // the protect middleware checks whether the user has a valid JWT
-// allow only the authenticated organizers to create bookings
+// allow only the authenticated provider to create bookings
 router.post(
     "/",
     protect,
-    authorizeRoles("ORGANIZER"),
+    authorizeRoles("PROVIDER"),
     createBooking
 );
 
 router.patch(
     "/:id/status",
     protect,
-    authorizeRoles("PROVIDER"),
+    authorizeRoles("ORGANIZER"),
     updateBookingStatus
 );
 // router.post("/", createBooking);

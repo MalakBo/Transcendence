@@ -33,18 +33,18 @@ services:
     command: npm run dev
 
   frontend:
-    build: ./frontend
-    restart: unless-stopped
-    ports:
-      - "5173:5173"
-    environment:
-      NODE_ENV: development
-    volumes:
-    - ./frontend:/app
-    - /app/node_modules
-    command: npx vite --host 0.0.0.0
-    depends_on:
-    - backend
+      build: ./frontend
+      restart: unless-stopped
+      ports:
+        - "5173:5173"
+      environment:
+        NODE_ENV: development
+      volumes:
+        - ./frontend:/app
+        - /app/node_modules
+      command: npx vite --host 0.0.0.0
+      depends_on:
+        - backend
 
 volumes:
   postgres_data:

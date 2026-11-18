@@ -1,4 +1,5 @@
 import { Routes, Route, Navigate } from "react-router-dom";
+import { LoginForm } from "../features/auth/components/form/LoginForm";
 
 function Placeholder({ title }) {
   return (
@@ -17,7 +18,7 @@ export default function App() {
   return (
     <Routes>
       <Route path="/" element={<Navigate to="/events" replace />} />
-      <Route path="/login" element={<Placeholder title="Authentication" />} />
+      <Route path="/login" element={<LoginForm />}  />
       <Route path="/events" element={<Placeholder title="Events" />} />
       <Route path="/providers" element={<Placeholder title="Providers" />} />
       <Route path="/bookings" element={<Placeholder title="Bookings" />} />

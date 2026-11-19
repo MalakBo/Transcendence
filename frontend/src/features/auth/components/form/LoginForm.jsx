@@ -68,7 +68,7 @@ export function LoginForm() {
       </form>
 
       <div className="login-card-footer">
-        Don't have an account? <a href="/register">Register</a>
+        Don't have an account? <a href="/signup">Register</a>
       </div>
     </div>
     </main>

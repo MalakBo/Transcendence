@@ -38,10 +38,10 @@ export function SignUp() {
         <div className="login-card">
         <div className="login-card-header">
           <h1 className="login-card-title">
-            Welcome back
+            Welcome
           </h1>
           <p className="login-card-description">
-            Enter your credentials to continue.
+            Enter your credentials to create an account.
           </p>
         </div>
 
@@ -94,7 +94,7 @@ export function SignUp() {
         </form>
 
         <div className="login-card-footer">
-          already have an account? <a href="/register">login</a>
+          already have an account? <a href="/login">login</a>
         </div>
       </div>
     </main>

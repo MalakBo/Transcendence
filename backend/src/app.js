@@ -15,7 +15,10 @@ import eventRoutes from "./modules/events/event.routes.js";
 const app = express();
 
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin: "http://localhost:5173",
+  credentials: true
+}));
 // thats what enables express to parse incoming JSON into req.body
 app.use(cookieParser());
 app.use(express.json());

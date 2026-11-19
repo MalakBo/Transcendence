@@ -1,4 +1,4 @@
-"use client";
+import { apiRequest } from "../../../../services/api.js";
 import { useState } from "react";
 
 export function LoginForm() {
@@ -15,21 +15,13 @@ export function LoginForm() {
       try
       {
         console.log("before fetch");
-        const response = await fetch("http://localhost:3000/auth/login", {
+        const response = await apiRequest("/auth/login", {
           method: "POST",
-          headers:  {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({
+          body:{
             email: email,
             password: password
-          })
+          }
         });
-        // if (!response.ok)
-        // {
-        //   throw new Error("Invalid credentials");
-        // }
-        console.log("After fetch");
         console.log(response);
       }catch(error)
       {
@@ -37,7 +29,7 @@ export function LoginForm() {
       }
     }
   return (
-    <main className="flex min-h-screen items-center justify-center">
+    <main>
     <div className="login-card">
       <div className="login-card-header">
         <h1 className="login-card-title">

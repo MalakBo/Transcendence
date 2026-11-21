@@ -7,13 +7,14 @@ export function SignUp() {
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const [retypePassword, setRetypePassword] = useState("");
     const [role, setRole] = useState("");
     const [ApiError, setApiError] = useState("");
     const [errors, setErrors] = useState({});
     async function handleSubmit(event)
     {
         event.preventDefault();
-        const values = {name, email, password, role};
+        const values = {name, email, password,retypePassword, role};
         const validationErrors = validateForm(values, validationRules);
 
         setErrors(validationErrors);
@@ -41,6 +42,8 @@ export function SignUp() {
       }catch(error)
       {
         setApiError("*" + error.message);
+        setApiError("");
+        return;
       }
     }
   return (
@@ -78,7 +81,7 @@ export function SignUp() {
           </div>
        
           <div className="form-group">
-            {/* <label className="form-label" disabled>Select your role</label> */}
+            <label className="form-label" disabled>Select your role</label>
             <select className="input" value={role}
               onChange={(event) => setRole(event.target.value)} name="role" id="role-select">
               <option className="input" value="" disabled>Select your role</option>
@@ -100,9 +103,22 @@ export function SignUp() {
             {errors.password && <p className="error-message">{errors.password}</p>}
           </div>
 
+          <div className="form-group">
+            <label className="form-label">Retype password</label>
+            <input
+              className="input"
+              type="password"
+              placeholder="Enter your password"
+              value={retypePassword}
+              onChange={(event) => setRetypePassword(event.target.value)}
+            />
+            {errors.retypePassword &&
+          <p className="error-message">{errors.retypePassword}</p>}
+          </div>
+
           {ApiError && <p className="error-message">{ApiError}</p>}
           <button type="submit" className="btn btn-primary full-width">
-            Sign up
+            <a href="/login">Sign up</a>
           </button>
         </form>
 

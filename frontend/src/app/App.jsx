@@ -24,21 +24,13 @@ export default function App() {
   return (
     <Routes>
       <Route path="/" element={<Navigate to="/events" replace />} />
-
-      {/* Authentication */}
       <Route path="/login" element={<LoginForm />} />
       <Route path="/signup" element={<SignUp />} />
-
-      {/* Providers and event opportunities */}
-      <Route path="/providers" element={<ProviderListPage />} />
-      <Route path="/opportunities" element={<EventListPage />} />
-
-      {/* Other modules */}
+      <Route path="/services" element={<ProviderListPage />} />
+      <Route path="/events" element={<EventListPage />} />
       <Route path="/events" element={<Placeholder title="Events" />} />
       <Route path="/bookings" element={<Placeholder title="Bookings" />} />
       <Route path="/chat" element={<Placeholder title="Chat" />} />
-
-      {/* Page not found */}
       <Route path="*" element={<Placeholder title="Page not found" />} />
     </Routes>
   );

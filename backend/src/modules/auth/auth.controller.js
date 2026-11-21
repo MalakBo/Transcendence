@@ -33,7 +33,7 @@ const register = async (req, res) => {
   if (!isValidSignup(req.body)) {
     return res
       .status(400)
-      .json({ error: "name, email, password and a valid role are required" });
+      .json({ error: "Invalid registration details" });
   }
 
   const { name, email, password, role } = req.body;

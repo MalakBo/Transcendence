@@ -1,5 +1,3 @@
-<<<<<<< HEAD
-
 @import "tailwindcss";
 
 /* ========================================
@@ -10,19 +8,14 @@
   /* Colors */
   --background: #ffffff;
   --foreground: #111111;
-
   --surface: #f7f7f7;
   --surface-hover: #eeeeee;
-
   --border: #e5e5e5;
   --muted: #737373;
-
   --primary: #111111;
   --primary-foreground: #ffffff;
-
   --secondary: #f0f0f0;
   --secondary-foreground: #111111;
-
   --danger: #dc2626;
   --success: #16a34a;
 
@@ -46,22 +39,16 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-
   --color-surface: var(--surface);
   --color-surface-hover: var(--surface-hover);
-
   --color-border: var(--border);
   --color-muted: var(--muted);
-
   --color-primary: var(--primary);
   --color-primary-foreground: var(--primary-foreground);
-
   --color-secondary: var(--secondary);
   --color-secondary-foreground: var(--secondary-foreground);
-
   --color-danger: var(--danger);
   --color-success: var(--success);
-
   --font-sans: var(--font-main);
 }
 
@@ -75,19 +62,11 @@
 
 html {
   scroll-behavior: smooth;
-=======
-@import "tailwindcss";
-
-:root {
-  font-family: Arial, Helvetica, sans-serif;
-  color: #28164b;
-  background: #f7f5ff;
->>>>>>> origin/feature/provider-profiles
 }
 
 body {
   margin: 0;
-<<<<<<< HEAD
+  min-width: 320px;
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-main);
@@ -350,7 +329,6 @@ hr,
   gap: 12px;
 }
 
-
 /* ========================================
    EVENT CARD
 ======================================== */
@@ -485,7 +463,4 @@ hr,
 .error-message
 {
   color: red;
-=======
-  min-width: 320px;
->>>>>>> origin/feature/provider-profiles
 }

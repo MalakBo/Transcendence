@@ -4,11 +4,17 @@ import { useState } from "react";
 export function LoginForm() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const [error, setError] = useState("");
     async function handleSubmit(event)
     {
         event.preventDefault();
-        console.log("Form submitted ", email, password);
+        if (!email || !password)
+        {
+          setError("*Please fill in all fields");
+          return;
+        }
         await login();
+        console.log("Form submitted ", email);
     }
     async function login()
     {
@@ -25,7 +31,7 @@ export function LoginForm() {
         console.log(response);
       }catch(error)
       {
-        console.error("Fetch error: ", error);
+        setError("*"+error.message);
       }
     }
   return (
@@ -61,7 +67,7 @@ export function LoginForm() {
             onChange={(event) => setPassword(event.target.value)}
           />
         </div>
-
+        {error && <p className="error-message">{error}</p>}
         <button type="submit" className="btn btn-primary full-width">
           Login
         </button>

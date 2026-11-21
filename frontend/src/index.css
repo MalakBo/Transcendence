@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 
 @import "tailwindcss";
 
@@ -74,10 +75,19 @@
 
 html {
   scroll-behavior: smooth;
+=======
+@import "tailwindcss";
+
+:root {
+  font-family: Arial, Helvetica, sans-serif;
+  color: #28164b;
+  background: #f7f5ff;
+>>>>>>> origin/feature/provider-profiles
 }
 
 body {
   margin: 0;
+<<<<<<< HEAD
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-main);
@@ -475,4 +485,7 @@ hr,
 .error-message
 {
   color: red;
+=======
+  min-width: 320px;
+>>>>>>> origin/feature/provider-profiles
 }

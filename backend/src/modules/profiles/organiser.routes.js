@@ -1,6 +1,6 @@
 import express from "express";
 import { protect, authorizeRoles } from "./auth.middleware.js";
-import { getOrganiserProfile, updateOrganiserProfile, chechDAta } from "../organisers/organiser.controller.js"
+import { getOrganiserProfile, updateOrganiserProfile } from "../organisers/organiser.controller.js"
 
 const router = express.Router();
 

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { apiRequest } from "../../../../services/api.js";
+import { useNavigate } from "react-router-dom";
 import {validateForm, validationRules} from "../../services/ValidateAuth.js";
 
 
@@ -11,6 +12,8 @@ export function SignUp() {
     const [role, setRole] = useState("");
     const [ApiError, setApiError] = useState("");
     const [errors, setErrors] = useState({});
+    const navigate = useNavigate();
+
     async function handleSubmit(event)
     {
         event.preventDefault();
@@ -21,8 +24,9 @@ export function SignUp() {
 
         if (Object.keys(validationErrors).length > 0)
           return;
-        console.log("Form submitted ", email, role);
         await signup();
+        console.log("Validation errors:", validationErrors);
+        console.log("Form submitted ", email, role);
     }
     async function signup()
     {
@@ -39,10 +43,18 @@ export function SignUp() {
           }
         });
         console.log(response);
+        const userRole = response.data.user.role;
+        if (userRole == "PROVIDER")
+        {
+          navigate("/events");
+        }
+        else
+        {
+          navigate("/services");
+        }
       }catch(error)
       {
         setApiError("*" + error.message);
-        setApiError("");
         return;
       }
     }
@@ -118,7 +130,7 @@ export function SignUp() {
 
           {ApiError && <p className="error-message">{ApiError}</p>}
           <button type="submit" className="btn btn-primary full-width">
-            <a href="/login">Sign up</a>
+              Sign up
           </button>
         </form>
 

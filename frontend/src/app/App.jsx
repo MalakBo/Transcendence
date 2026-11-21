@@ -1,4 +1,6 @@
 import { Routes, Route, Navigate } from "react-router-dom";
+import ProviderListPage from "../features/providers/pages/ProviderListPage";
+import EventListPage from "../features/providers/pages/EventListPage";
 
 function Placeholder({ title }) {
   return (
@@ -19,10 +21,11 @@ export default function App() {
       <Route path="/" element={<Navigate to="/events" replace />} />
       <Route path="/login" element={<Placeholder title="Authentication" />} />
       <Route path="/events" element={<Placeholder title="Events" />} />
-      <Route path="/providers" element={<Placeholder title="Providers" />} />
+      <Route path="/providers" element={<ProviderListPage />} />
       <Route path="/bookings" element={<Placeholder title="Bookings" />} />
       <Route path="/chat" element={<Placeholder title="Chat" />} />
       <Route path="*" element={<Placeholder title="Page not found" />} />
+      <Route path="/opportunities" element={<EventListPage />} />
     </Routes>
   );
 }

@@ -9,22 +9,51 @@ import { db } from "../../prisma/db.ts";
 
 export const getAllBookings = async (userId, role) => 
 {
-    if (role === "ORGANIZER") 
+    if (role === "ORGANIZER")
     {
         const events = await db.orm.public.Event
-            .where({ organizerId: userId })
-            .all();
+        .where({ organizerId: userId })
+        .all();
 
         const bookings = [];
-        for (const event of events) 
+        for (const event of events)
         {
             const eventBookings = await db.orm.public.Booking
                 .where({ eventId: event.id })
                 .all();
-            bookings.push(...eventBookings);
+
+            for (const booking of eventBookings)
+            {
+                const service = await db.orm.public.ProviderService
+                    .where({ id: booking.providerServiceId })
+                    .select("id", "name")
+                    .first();
+                
+                bookings.push({
+                    ...booking,
+                    eventTitle: event.title,
+                    serviceName: service?.name ?? "Unknown Service"
+                });
+            }
         }
         return bookings;
     }
+    // if (role === "ORGANIZER") 
+    // {
+    //     const events = await db.orm.public.Event
+    //         .where({ organizerId: userId })
+    //         .all();
+
+    //     const bookings = [];
+    //     for (const event of events) 
+    //     {
+    //         const eventBookings = await db.orm.public.Booking
+    //             .where({ eventId: event.id })
+    //             .all();
+    //         bookings.push(...eventBookings);
+    //     }
+    //     return bookings;
+    // }
     if (role === "PROVIDER") 
     {
         const provider = await db.orm.public.ProviderProfile
@@ -41,14 +70,37 @@ export const getAllBookings = async (userId, role) =>
 
         const bookings = [];
 
-        for (const service of services) 
+        for (const service of services)
         {
             const serviceBookings = await db.orm.public.Booking
-                .where({ providerServiceId: service.id })
-                .all();
-
-            bookings.push(...serviceBookings);
+            .where({ providerServiceId: service.id })
+            .all();
+            for (const booking of serviceBookings)
+            {
+                const event = await db.orm.public.Event
+                .where({ id: booking.eventId })
+                .select("id", "title")
+                .first();
+                bookings.push({
+                    ...booking,
+                    eventTitle: event?.title ?? "Unknown Event",
+                    serviceName: service.name
+                });
+                // bookings.push({
+                //     ...booking,
+                //     eventTitle: event?.title ?? "Unknown Event"
+                // });
+            }
         }
+
+        // for (const service of services) 
+        // {
+        //     const serviceBookings = await db.orm.public.Booking
+        //         .where({ providerServiceId: service.id })
+        //         .all();
+
+        //     bookings.push(...serviceBookings);
+        // }
 
         return bookings;
     }

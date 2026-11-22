@@ -1,5 +1,5 @@
 import { Routes, Route, Navigate } from "react-router-dom";
-
+import BookingsPage from "../features/bookings/pages/BookingsPage";
 function Placeholder({ title }) {
   return (
     <main className="min-h-screen bg-[#F7F5FF] p-10">
@@ -20,7 +20,7 @@ export default function App() {
       <Route path="/login" element={<Placeholder title="Authentication" />} />
       <Route path="/events" element={<Placeholder title="Events" />} />
       <Route path="/providers" element={<Placeholder title="Providers" />} />
-      <Route path="/bookings" element={<Placeholder title="Bookings" />} />
+      <Route path="/bookings" element={<BookingsPage />} />
       <Route path="/chat" element={<Placeholder title="Chat" />} />
       <Route path="*" element={<Placeholder title="Page not found" />} />
     </Routes>

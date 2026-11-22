@@ -23,7 +23,7 @@ wait-db:
 	@echo "PostgreSQL is ready!"
 
 down:
-	docker compose down
+	docker compose down -v
 
 restart:
 	docker compose down
@@ -55,4 +55,4 @@ db-migrate:
 db-init: db-emit db-migrate
 
 db-shell:
-	docker compose exec database sh -c 'psql -U "$$DB_USER" -d "$$DB_NAME"'
+	docker compose exec database sh -c 'psql -U "$$POSTGRES_USER" -d "$$POSTGRES_NAME"'

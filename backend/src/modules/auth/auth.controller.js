@@ -88,4 +88,11 @@ const logout = async (req, res) => {
   });
 };
 
-export { register, login, logout };
+/* me */
+const me = async (req, res) => {
+  return res.status(200).json({
+    user: req.user,
+  });
+};
+
+export { register, login, logout, me };

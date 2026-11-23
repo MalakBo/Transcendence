@@ -1,30 +1,58 @@
-up:
+.PHONY: all build up down restart ps logs install dev backend frontend \
+        db-emit db-status db-shell db-migrate db-init wait-db
+
+all: dev
+
+build:
+	docker compose build
+
+up: build
 	docker compose up -d
 
+dev: build
+	docker compose up -d database
+	@$(MAKE) wait-db
+	@$(MAKE) db-migrate
+	docker compose up
+
+wait-db:
+	@until docker compose exec -T database pg_isready -U "$${DB_USER}" -d "$${DB_NAME}" > /dev/null 2>&1; do \
+		echo "Waiting for PostgreSQL..."; \
+		sleep 2; \
+	done
+	@echo "PostgreSQL is ready!"
+
 down:
-	docker compose down
+	docker compose down -v
 
 restart:
 	docker compose down
-	docker compose up -d
+	$(MAKE) dev
 
 ps:
 	docker compose ps
 
+install: build
+
 backend:
-	cd backend && npm run dev
+	docker compose up --build backend
 
-install:
-	cd backend && npm install
-
-db-emit:
-	cd backend && npx prisma contract emit
-
-db-status:
-	cd backend && npx prisma migration status
-
-db-shell:
-	docker exec -it eventmatch-postgres psql -U eventmatch -d eventmatch
+frontend:
+	docker compose up --build frontend
 
 logs:
 	docker compose logs -f
+
+db-emit:
+	docker compose run --rm backend npx prisma contract emit
+
+db-status:
+	docker compose run --rm backend npx prisma migration status
+
+db-migrate:
+	docker compose run --rm backend npx prisma db init
+
+db-init: db-emit db-migrate
+
+db-shell:
+	docker compose exec database sh -c 'psql -U "$$DB_USER" -d "$$DB_NAME"'

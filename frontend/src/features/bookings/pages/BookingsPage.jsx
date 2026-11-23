@@ -242,14 +242,6 @@ export default function BookingsPage() {
 
   async function handleBookingDecision(bookingId, status) {
     const action = status === "ACCEPTED" ? "accept" : "reject";
-
-    // const confirmed = window.confirm(
-    //   `Are you sure you want to ${action} this booking?`
-    // );
-
-    // if (!confirmed) {
-    //   return;
-    // }
     const organizerMessage = window.prompt(
         `You are about to ${action} this booking.\n\nEnter a message for the provider (optional):`,
         ""
@@ -270,7 +262,6 @@ export default function BookingsPage() {
       );
 
       console.log("Booking update result:", result);
-
       // Update the booking in React without refreshing the page
       setBookings((previousBookings) =>
         previousBookings.map((booking) =>

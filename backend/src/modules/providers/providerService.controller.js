@@ -196,7 +196,7 @@ export async function createService(req, res) {
 export async function getServices(req, res) {
   try {
     const { providerId } = req.params;
-    const result = await getProviderServices;
+    const result = await getProviderServices(providerId);
     if(result.status === "provider_not_found")
       return res.status(404).json({
           success: false,

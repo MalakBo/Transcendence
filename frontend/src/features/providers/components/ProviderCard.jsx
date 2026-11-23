@@ -10,7 +10,7 @@ export default function ProviderCard({ provider}) {
             <p className="text-muted text-sm">📍 {provider.location}</p>
             <p className="text-sm leading-relaxed">{provider.description || "No description available."}</p>
             <div className="mt-auto pt-3">
-                <Link to={`/providers/${provider._id}`} className="btn btn-primary full-width">View Profile</Link>
+                <Link to={`/providers/${provider.id}`} className="btn btn-primary full-width">View Profile</Link>
             </div>
         </article>
     );

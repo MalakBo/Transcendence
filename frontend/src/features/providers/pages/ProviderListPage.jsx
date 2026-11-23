@@ -61,6 +61,24 @@ export default function ProviderListPage() {
         }
         loadProviders();
     }, [search, location, category, minPrice, maxPrice, page]);
+    async function createTestProvider() {
+    try {
+        const response = await apiRequest("/api/providers", {
+            method: "POST",
+            body: {
+                businessName: "Atlas Photography",
+                description: "Professional photography for weddings, birthdays and special events.",
+                location: "Rabat",
+                websiteUrl: "https://example.com",
+            },
+        });
+
+        console.log("Provider created:", response);
+        window.location.reload();
+    } catch (err) {
+        alert(err.message || "Failed to create provider");
+    }
+}
     function clearFilters() {
         setSearch("");
         setLocation("");
@@ -73,6 +91,13 @@ export default function ProviderListPage() {
 return (
   <main className="!block min-h-screen bg-white px-5 py-12 sm:px-8">
     <div className="mx-auto w-full max-w-6xl">
+      <button
+    type="button"
+    onClick={createTestProvider}
+    className="mb-4 rounded-xl bg-black px-5 py-3 text-white"
+>
+    Create Test Provider
+</button>
         <section className="relative mb-4 overflow-hidden rounded-3xl bg-neutral-950 px-6 py-3 text-white sm:px-8 sm:py-4">
             <div className="pointer-events-none absolute -right-16 -top-20 h-72 w-72 rounded-full border border-white/15" />
             <div className="pointer-events-none absolute -right-4 -top-8 h-52 w-32 rounded-full border border-white/15" />
@@ -84,7 +109,7 @@ return (
                 </h1>
                 <p className="mb-3 max-w-lg text-base leading-relaxed text-neutral-300">
                     Discover talented professionals and services
-                    to brinf your next event to life.
+                    to bring your next event to life.
                 </p>
                 <div className="flex flex-wrap gap-2">
                     {["Photography", "Catering", "Decoration", "Music"].map(
@@ -99,7 +124,6 @@ return (
             </div>
         </section>
 
-      {/* Search and filters card */}
       <section className="mb-10 rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm sm:p-8">
         <div className="flex flex-col gap-6">
           <ProviderSearchBar
@@ -145,21 +169,18 @@ return (
         </div>
       </section>
 
-      {/* Loading state */}
       {loading && (
         <p className="text-neutral-500">
           Loading providers...
         </p>
       )}
 
-      {/* Error state */}
       {!loading && error && (
         <p role="alert" className="text-red-600">
           {error}
         </p>
       )}
 
-      {/* Empty state */}
       {!loading && !error && providers.length === 0 && (
         <div className="rounded-2xl border border-neutral-200 bg-neutral-50 px-6 py-16 text-center">
           <h2 className="mb-3 text-xl font-semibold text-black">
@@ -171,7 +192,6 @@ return (
         </div>
       )}
 
-      {/* Provider cards */}
       {!loading && !error && providers.length > 0 && (
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
           {providers.map((provider) => (
@@ -183,7 +203,7 @@ return (
         </div>
       )}
       {!loading && !error && (page > 1 || hasMore) && (
-        <div className="mt-10 flex items-center jutify-center gap-4">
+        <div className="mt-10 flex items-center justify-center gap-4">
             <button type="button" disabled={page === 1}
             onClick={() => setPage((p) => Math.max(1, p - 1))}
             className="rounded-xl border border-neutral-300 bg-white px-5 py-3 font-medium text-black transition hover:bg-neutral-100 disabled:cursor-not-allowed disabled:opacity-40">

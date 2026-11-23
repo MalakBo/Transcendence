@@ -3,6 +3,7 @@ import { Routes, Route, Navigate } from "react-router-dom";
 
 import ProviderListPage from "../features/providers/pages/ProviderListPage";
 import EventListPage from "../features/providers/pages/EventListPage";
+import ProviderDetailPage from "../features/providers/pages/ProviderDetailPage";
 
 import { LoginForm } from "../features/auth/components/form/LoginForm";
 import { SignUp } from "../features/auth/components/form/SignUp";
@@ -31,6 +32,7 @@ export default function App() {
       <Route path="/events" element={<Placeholder title="Events" />} />
       <Route path="/bookings" element={<Placeholder title="Bookings" />} />
       <Route path="/chat" element={<Placeholder title="Chat" />} />
+      <Route path="/providers/:id" element={<ProviderDetailPage />} />
       <Route path="*" element={<Placeholder title="Page not found" />} />
     </Routes>
   );

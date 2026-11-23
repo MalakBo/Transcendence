@@ -6,7 +6,7 @@ const router = Router();
 
 router.get("/", getProviders);
 router.get("/:id", getProviderById);
-router.post("/", createProvider);
+router.post("/", protect, authorizeRoles("PROVIDER"), createProvider);
 router.patch("/:id", protect, updateProvider);
 // provider services routes
 router.post("/:providerId/services", protect, createService);

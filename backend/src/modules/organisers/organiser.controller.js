@@ -1,4 +1,4 @@
-import { updateProfileInDB } from "./organizer.service.js"
+import { updateProfileInDB, getMyEventsInDB, getUpcomingEventsInDB, getPastEventsInDB } from "./organizer.service.js"
 
 export const getOrganiserProfile = (req, res) => {
     try
@@ -32,5 +32,45 @@ export const updateOrganiserProfile = async (req, res) => {
     catch (error)
     {
         res.status(400).json("bad Request");
+    }
+}
+
+export const getMyEvents = async (req, res) => {
+    try
+    {
+        const myEvents = await getMyEventsInDB(req.user.id);
+        res.status(200).json(myEvents);
+    }
+    catch(error)
+    {
+        res.status(404).json("bad Request");
+    }
+}
+
+export const getUpcomingEvents = async (req, res) => {
+    try
+    {
+        const upcomingevents = await getUpcomingEventsInDB(req.user.id);
+        if (!upcomingevents)
+            return res.status(404).json("bad Request!!");
+        res.status(200).json(upcomingevents);
+    }
+    catch(error)
+    {
+        res.status(404).json("bad Request");
+    }
+}
+
+export const getPastEvents = async (req, res) => {
+    try
+    {
+        const pastevents = await getPastEventsInDB(req.user.id);
+        if (!pastevents)
+            return res.status(404).json("bad Request!!");
+        res.status(200).json(pastevents);
+    }
+    catch(error)
+    {
+        res.status(404).json("bad Request");
     }
 }

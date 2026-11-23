@@ -1,6 +1,7 @@
 
 import { Routes, Route, Navigate } from "react-router-dom";
 import BookingsPage from "../features/bookings/pages/BookingsPage";
+import BookingRequestPage from "../features/bookings/pages/BookingRequestPage";
 
 import ProviderListPage from "../features/providers/pages/ProviderListPage";
 import EventListPage from "../features/providers/pages/EventListPage";
@@ -29,10 +30,9 @@ export default function App() {
       <Route path="/signup" element={<SignUp />} />
       <Route path="/services" element={<ProviderListPage />} />
       <Route path="/events" element={<EventListPage />} />
-      <Route path="/events" element={<Placeholder title="Events" />} />
       <Route path="/providers" element={<Placeholder title="Providers" />} />
       <Route path="/bookings" element={<BookingsPage />} />
-      {/* <Route path="/bookings" element={<Placeholder title="Bookings" />} /> */}
+      <Route path="/bookings/request/:eventId" element={<BookingRequestPage />}/>
       <Route path="/chat" element={<Placeholder title="Chat" />} />
       <Route path="*" element={<Placeholder title="Page not found" />} />
     </Routes>

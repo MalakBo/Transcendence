@@ -243,12 +243,20 @@ export default function BookingsPage() {
   async function handleBookingDecision(bookingId, status) {
     const action = status === "ACCEPTED" ? "accept" : "reject";
 
-    const confirmed = window.confirm(
-      `Are you sure you want to ${action} this booking?`
-    );
+    // const confirmed = window.confirm(
+    //   `Are you sure you want to ${action} this booking?`
+    // );
 
-    if (!confirmed) {
-      return;
+    // if (!confirmed) {
+    //   return;
+    // }
+    const organizerMessage = window.prompt(
+        `You are about to ${action} this booking.\n\nEnter a message for the provider (optional):`,
+        ""
+    );
+    if (organizerMessage === null) 
+    {
+        return;
     }
 
     try {
@@ -258,7 +266,7 @@ export default function BookingsPage() {
       const result = await updateBookingStatus(
         bookingId,
         status,
-        ""
+        organizerMessage
       );
 
       console.log("Booking update result:", result);
@@ -362,7 +370,8 @@ export default function BookingsPage() {
                 )}
 
                 {/* Accept / Reject buttons */}
-                {booking.status === "PENDING" && (
+                {user?.role === "ORGANIZER" && booking.status === "PENDING" && (
+                // {booking.status === "PENDING" && (
                   <div className="mt-5 flex gap-3">
                     <button
                       type="button"

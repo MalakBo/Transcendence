@@ -24,3 +24,18 @@ export function updateBookingStatus(
   });
 }
 
+// Create a booking request for an event
+export async function createBookingRequest(
+  eventId,
+  providerServiceId,
+  providerMessage
+) {
+  return apiRequest("/api/bookings", {
+    method: "POST",
+    body: {
+      eventId,
+      providerServiceId,
+      providerMessage
+    }
+  });
+}

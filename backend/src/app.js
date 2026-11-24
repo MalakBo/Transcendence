@@ -3,26 +3,31 @@ import express from "express";
 import bookingRoutes from "./modules/bookings/booking.routes.js";
 import cors from "cors";
 // Think of app as the central object that organizes your backend's HTTP behavior.
-
 import authRoutes from "./modules/auth/auth.routes.js"
-import providerRoutes from "./modules/profiles/provider.routes.js";
+import providerAreaRoutes from "./modules/profiles/provider.routes.js";
+import providerRoutes from "./modules/providers/provider.routes.js";
 import organiserRoutes from "./modules/profiles/organiser.routes.js";
 import 'temporal-polyfill/full/global'
 import cookieParser from "cookie-parser";
-
-
-
+// by fatyy
+import eventRoutes from "./modules/events/event.routes.js";
 
 
 const app = express();
 
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin: "http://localhost:5173",
+  credentials: true
+}));
 // thats what enables express to parse incoming JSON into req.body
 app.use(cookieParser());
 app.use(express.json());
 // by basma
 app.use("/api/bookings", bookingRoutes);
+
+// by faty
+app.use("/api/events", eventRoutes);
 
 // Test route
 app.get("/api/health", (req, res) => {
@@ -38,6 +43,7 @@ app.use("/auth", authRoutes);
 
 //Profiles routes
 app.use("/api/providers", providerRoutes);
+app.use("/provider-area", providerAreaRoutes);
 app.use("/organiser", organiserRoutes);
 
 

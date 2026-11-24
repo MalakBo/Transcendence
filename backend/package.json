@@ -7,7 +7,7 @@
     "test": "tests"
   },
   "scripts": {
-    "dev": "DOTENV_CONFIG_PATH=../.env nodemon src/start.js",
+    "dev": "DOTENV_CONFIG_PATH=../.env nodemon --exec tsx src/start.js",
     "start": "DOTENV_CONFIG_PATH=../.env node src/start.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "postinstall": "prisma skills sync || exit 0",
@@ -34,6 +34,7 @@
     "@types/node": "^26.6.3",
     "nodemon": "^3.1.14",
     "prettier": "^3.9.10",
-    "prisma": "^8.0.0-rc.17"
+    "prisma": "^8.0.0-rc.17",
+    "tsx": "^4.23.15"
   }
 }

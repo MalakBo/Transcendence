@@ -27,7 +27,7 @@ export default function App() {
       <Route path="/" element={<Navigate to="/events" replace />} />
       <Route path="/login" element={<LoginForm />} />
       <Route path="/signup" element={<SignUp />} />
-      <Route path="/services" element={<ProviderListPage />} />
+      <Route path="/providers" element={<ProviderListPage />} />
       <Route path="/events" element={<EventListPage />} />
       <Route path="/events" element={<Placeholder title="Events" />} />
       <Route path="/bookings" element={<Placeholder title="Bookings" />} />

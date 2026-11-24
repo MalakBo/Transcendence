@@ -18,7 +18,7 @@ export default function ProviderDetailPage() {
                 setLoading(true);
                 setError("");
                 const [providerResponse, servicesResponse] = await Promise.all([
-                    apiRequest(`/api/services/${id}`),
+                    apiRequest(`/api/providers/${id}`),
                     apiRequest(`/api/providers/${id}/services`),
                 ]);
                 if (!cancelled) {

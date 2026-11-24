@@ -1,5 +1,5 @@
 
-import { createProviderService, getProviderServices, updateProviderService, deleteProviderService } from "./providerService.service.js";
+import { createProviderService, getProviderServices, updateProviderService, deleteProviderService, getServiceCategories } from "./providerService.service.js";
 
 // CREATE PROVIDER SERVICE
 // POST /api/providers/:providerId/services
@@ -332,6 +332,23 @@ export async function deleteService(req, res) {
     });
   } catch (error) {
     console.error("Error deleting provider service:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    });
+  }
+}
+export async function getCategories(req, res) {
+  try {
+    const categories = await getServiceCategories();
+
+    return res.status(200).json({
+      success: true,
+      data: categories,
+    });
+  } catch (error) {
+    console.error("Error getting service categories:", error);
+
     return res.status(500).json({
       success: false,
       message: "Internal server error",

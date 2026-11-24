@@ -311,3 +311,10 @@ export async function deleteProviderService(
 
   return { status: "success" };
 }
+export async function getServiceCategories() {
+  const categories = await db.orm.public.ServiceCategory
+    .select("id", "name", "description", "iconUrl")
+    .all();
+
+  return categories;
+}

@@ -1,10 +1,13 @@
 import { apiRequest } from "../../../../services/api.js";
+import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 
 export function LoginForm() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
+    const navigate = useNavigate();
+    
     async function handleSubmit(event)
     {
         event.preventDefault();
@@ -29,9 +32,19 @@ export function LoginForm() {
           }
         });
         console.log(response);
+        const role = response.data.user.role;
+        if (role == "PROVIDER")
+        {
+          navigate("/events");
+        }
+        else
+        {
+          navigate("/services");
+        }
       }catch(error)
       {
         setError("*"+error.message);
+        return;
       }
     }
   return (
@@ -69,7 +82,7 @@ export function LoginForm() {
         </div>
         {error && <p className="error-message">{error}</p>}
         <button type="submit" className="btn btn-primary full-width">
-          Login
+          <a href="/services">Login</a>
         </button>
       </form>
 

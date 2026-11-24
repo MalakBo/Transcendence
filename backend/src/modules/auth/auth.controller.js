@@ -33,7 +33,7 @@ const register = async (req, res) => {
   if (!isValidSignup(req.body)) {
     return res
       .status(400)
-      .json({ error: "name, email, password and a valid role are required" });
+      .json({ error: "Invalid registration details" });
   }
 
   const { name, email, password, role } = req.body;
@@ -88,4 +88,11 @@ const logout = async (req, res) => {
   });
 };
 
-export { register, login, logout };
+/* me */
+const me = async (req, res) => {
+  return res.status(200).json({
+    user: req.user,
+  });
+};
+
+export { register, login, logout, me };

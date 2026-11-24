@@ -90,9 +90,8 @@ const logout = async (req, res) => {
 
 /* me */
 const me = async (req, res) => {
-  return res.status(200).json({
-    user: req.user,
-  });
+  if (!req.user && req.cookies?.jwt) res.clearCookie("jwt", JWT_COOKIE_OPTIONS);
+  return res.status(200).json({ user: req.user });
 };
 
 export { register, login, logout, me };

@@ -1,9 +1,12 @@
 import { apiRequest } from "../../../../services/api";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../../../context/AuthContext";
+import { Button } from "../../../../../components/ui/button";
 
 export function Logout()
 {
     const navigate = useNavigate();
+    const { setUser } = useAuth();
     async function logout(event)
     {
         event.preventDefault();
@@ -12,11 +15,12 @@ export function Logout()
         });
         console.log(response);
         if (response.status === "success") {
+            setUser(null);
             navigate("/login");
         }
     }
     return (
-        <form onSubmit={logout}>
-            <button>Logout</button>
-        </form>);
+        <Button variant="ghost" onClick={logout}>
+            Logout
+        </Button>);
 }

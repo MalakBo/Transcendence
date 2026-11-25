@@ -48,8 +48,6 @@ app.use("/api/providers", providerRoutes);
 app.use("/provider-area", providerAreaRoutes);
 app.use("/organiser", organiserRoutes);
 
-// Events routes
-app.use("/api/events", eventRoutes);
 
 
 export default app;

@@ -1,12 +1,14 @@
 import { apiRequest } from "../../../../services/api.js";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
+import { useAuth } from "../../../../context/AuthContext";
 
 export function LoginForm() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
     const navigate = useNavigate();
+    const { setUser } = useAuth();
     
     async function handleSubmit(event)
     {
@@ -31,8 +33,11 @@ export function LoginForm() {
             password: password
           }
         });
+
         console.log(response);
+        setUser(response.data.user);
         const role = response.data.user.role;
+
         if (role == "PROVIDER")
         {
           navigate("/events");
@@ -82,7 +87,7 @@ export function LoginForm() {
         </div>
         {error && <p className="error-message">{error}</p>}
         <button type="submit" className="btn btn-primary full-width">
-          <a href="/services">Login</a>
+          Login
         </button>
       </form>
 

@@ -11,7 +11,7 @@ export function Logout()
     {
         event.preventDefault();
         const response = await apiRequest("/auth/logout", {
-            method: "Post"
+            method: "POST"
         });
         console.log(response);
         if (response.status === "success") {

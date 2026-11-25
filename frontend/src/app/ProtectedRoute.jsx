@@ -1,7 +1,14 @@
 import { Navigate, Outlet } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
-export default function ProtectedRoute() {
+function navigateByRole(role) {
+    if (role === "PROVIDER")
+        return "/events";
+    if (role === "ORGANIZER")
+        return "/services";
+}
+
+export default function ProtectedRoute({ allowedRoles }) {
     const { user, loading } = useAuth();
 
     if (loading) {
@@ -12,5 +19,8 @@ export default function ProtectedRoute() {
         return <Navigate to="/login" replace />;
     }
 
+    if (allowedRoles && !allowedRoles.includes(user.role)) {
+        return <Navigate to={navigateByRole(user.role)} replace/>;
+    }
     return <Outlet />;
 }

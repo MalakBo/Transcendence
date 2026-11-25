@@ -24,15 +24,24 @@ export default function App() {
             <Route path="/login" element={<LoginForm />} />
             <Route path="/signup" element={<SignUp />} />
 
-            {/* Protected routes */}
-            <Route element={<ProtectedRoute />}>
-                <Route path="/" element={<Navigate to="/events" replace />} />
-                <Route path="/services" element={<ProviderListPage />} />
-                <Route path="/events" element={<EventListPage />} />
+            {/* Should be just authenticated */}
+            <Route element={<ProtectedRoute/>}>
                 <Route path="/bookings" element={<Placeholder title="Bookings" />} />
                 <Route path="/chat" element={<Placeholder title="Chat" />} />
             </Route>
+            
 
+            {/* Protected routes */}
+            {/* Provider: */}
+            <Route element={<ProtectedRoute allowedRoles={["PROVIDER", "ADMIN"]} />}>
+                <Route path="/" element={<Navigate to="/events" replace />} />
+                <Route path="/events" element={<EventListPage />} />
+            </Route>
+            {/* organizer: */}
+            <Route element={<ProtectedRoute allowedRoles={["ORGANIZER", "ADMIN"]} />}>
+                <Route path="/" element={<Navigate to="/services" replace />} />
+            <Route path="/services" element={<ProviderListPage />} />
+            </Route>
             <Route path="*" element={<Placeholder title="Page not found" />} />
         </Routes>
     );

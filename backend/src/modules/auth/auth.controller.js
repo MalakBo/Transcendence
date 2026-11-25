@@ -1,11 +1,13 @@
 import { db } from "./auth.config.db.js";
 import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
 import {
   generateToken,
   pickOptionalFields,
   isValidSignup,
   hashPassword,
   findUserByEmail,
+  findUserById
 } from "./auth.utils.js";
 
 const Users = db.orm.public.User;
@@ -108,8 +110,38 @@ const logout = async (req, res) => {
 };
 
 /* me */
+/* me */
 const me = async (req, res) => {
-    return sendAuthResponse(res, 200, req.user, null);
+  const token = req.cookies.jwt;
+
+  // No cookie: nobody is logged in
+  if (!token) {
+    return res.status(200).json({
+      status: "success",
+      data: { user: null },
+    });
+  }
+
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const user = await findUserById(decoded.id);
+
+    // Account deleted or disabled
+    if (!user || !user.isActive) {
+      return res.status(200).json({
+        status: "success",
+        data: { user: null },
+      });
+    }
+
+    return sendAuthResponse(res, 200, user, null);
+  } catch (error) {
+    // Token invalid or expired
+    return res.status(200).json({
+      status: "success",
+      data: { user: null },
+    });
+  }
 };
 
 export { register, login, logout, me };

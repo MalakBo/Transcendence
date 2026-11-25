@@ -2,6 +2,7 @@ import { useState } from "react";
 import { apiRequest } from "../../../../services/api.js";
 import { useNavigate } from "react-router-dom";
 import {validateForm, validationRules} from "../../services/ValidateAuth.js";
+import { useAuth } from "../../../../context/AuthContext.jsx";
 
 
 export function SignUp() {
@@ -13,6 +14,7 @@ export function SignUp() {
     const [ApiError, setApiError] = useState("");
     const [errors, setErrors] = useState({});
     const navigate = useNavigate();
+    const { setUser } = useAuth();
 
     async function handleSubmit(event)
     {
@@ -25,8 +27,15 @@ export function SignUp() {
         if (Object.keys(validationErrors).length > 0)
           return;
         await signup();
-        console.log("Validation errors:", validationErrors);
         console.log("Form submitted ", email, role);
+    }
+
+    function redirectByRole(userRole) {
+      if (userRole === "PROVIDER")
+          navigate("/events");
+      if (userRole === "ORGANIZER")
+          navigate("/services");
+      replace: true;
     }
     async function signup()
     {
@@ -44,14 +53,8 @@ export function SignUp() {
         });
         console.log(response);
         const userRole = response.data.user.role;
-        if (userRole == "PROVIDER")
-        {
-          navigate("/events");
-        }
-        else
-        {
-          navigate("/services");
-        }
+        setUser(response.data.user);
+        redirectByRole(userRole);
       }catch(error)
       {
         setApiError("*" + error.message);

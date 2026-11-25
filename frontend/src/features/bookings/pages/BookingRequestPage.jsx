@@ -1,9 +1,30 @@
 
 import { useParams, Link } from "react-router-dom";
 import BookingRequestForm from "../components/BookingRequestForm.jsx";
+import { useState, useEffect } from "react";
+import { getAvailableServices } from "../services/bookingServices.js";
 
 export default function BookingRequestPage() {
   const { eventId } = useParams();
+
+  const [services, setServices] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    async function loadServices() {
+        try {
+            const data = await getAvailableServices();
+            setServices(data);
+        } catch (err) {
+            setError(err.message);
+        } finally {
+            setLoading(false);
+        }
+    }
+
+    loadServices();
+}, []);
 
   return (
     <main className="mx-auto max-w-2xl px-6 py-10">
@@ -23,7 +44,18 @@ export default function BookingRequestPage() {
           Select your service and write a message to the event organizer.
         </p>
 
-        <BookingRequestForm eventId={eventId} />
+        {loading ? (
+          <p>Loading available services...</p>
+        ) : error ? (
+          <p className="text-red-600">{error}</p>
+        ) : (
+        <BookingRequestForm
+          eventId={eventId}
+          services={services}
+       />
+      )}
+
+        {/* <BookingRequestForm eventId={eventId} /> */}
       </div>
     </main>
   );

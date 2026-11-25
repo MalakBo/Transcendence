@@ -211,12 +211,12 @@
 //   );
 // }
 
-
-
 import { useState, useEffect } from "react";
 import {
   getBookings,
-  updateBookingStatus
+  updateBookingStatus,
+  getCurrentUser
+
 } from "../services/bookingServices.js";
 
 export default function BookingsPage() {
@@ -224,6 +224,7 @@ export default function BookingsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [updatingId, setUpdatingId] = useState(null);
+  const [currentUser, setCurrentUser] = useState(null);
 
   useEffect(() => {
     async function loadBookings() {
@@ -236,9 +237,24 @@ export default function BookingsPage() {
         setLoading(false);
       }
     }
+    
 
     loadBookings();
   }, []);
+
+  useEffect(() => {
+    async function loadCurrentUser() {
+        try {
+            const user = await getCurrentUser();
+            setCurrentUser(user);
+        } catch (err) {
+            setCurrentUser(null);
+            console.error("Failed to retrieve current user:", err);
+        }
+    }
+
+    loadCurrentUser();
+}, []);
 
   async function handleBookingDecision(bookingId, status) {
     const action = status === "ACCEPTED" ? "accept" : "reject";
@@ -277,6 +293,8 @@ export default function BookingsPage() {
       setUpdatingId(null);
     }
   }
+
+//   console.log("Current user role:", currentUser?.role);
 
   return (
     <main className="min-h-screen bg-[#F7F5FF] p-10">
@@ -361,7 +379,7 @@ export default function BookingsPage() {
                 )}
 
                 {/* Accept / Reject buttons */}
-                {user?.role === "ORGANIZER" && booking.status === "PENDING" && (
+                {currentUser?.role === "ORGANIZER" && booking.status === "PENDING" && (
                 // {booking.status === "PENDING" && (
                   <div className="mt-5 flex gap-3">
                     <button

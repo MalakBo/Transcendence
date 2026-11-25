@@ -39,3 +39,22 @@ export async function createBookingRequest(
     }
   });
 }
+
+export async function getCurrentUser() 
+{
+    const response = await apiRequest("/auth/me", {
+        method: "GET"
+    });
+
+    return response.user;
+}
+export async function getAvailableServices() {
+    const response = await apiRequest(
+        "/api/bookings/available-services",
+        {
+            method: "GET"
+        }
+    );
+
+    return response.services;
+}

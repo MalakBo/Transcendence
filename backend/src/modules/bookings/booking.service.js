@@ -254,3 +254,29 @@ export const updateBookingStatus = async (
 
     return updatedBooking;
 };
+
+export const getAvailableServices = async (userId) => {
+    // 1. Find the authenticated provider's profile
+    const provider = await db.orm.public.ProviderProfile
+        .where({ userId })
+        .first();
+
+    // 2. Check whether the provider profile exists
+    if (!provider) {
+        const error = new Error("Provider profile not found");
+        error.statusCode = 404;
+        throw error;
+    }
+
+    // 3. Retrieve only active services owned by the provider
+    const services = await db.orm.public.ProviderService
+        .where({
+            providerId: provider.id,
+            isActive: true
+        })
+        .select("id", "name", "description", "price", "isActive")
+        .all();
+
+    // 4. Return available services
+    return services;
+};

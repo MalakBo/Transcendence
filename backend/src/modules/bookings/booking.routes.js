@@ -2,7 +2,8 @@ import express from "express";
 
 import { getBookings,
          createBooking,
-         updateBookingStatus
+         updateBookingStatus,
+         getBookingAvailableServices
  } from "./booking.controller.js";
 
 
@@ -39,6 +40,13 @@ router.patch(
     updateBookingStatus
 );
 // router.post("/", createBooking);
+
+router.get(
+    "/available-services",
+    protect,
+    authorizeRoles("PROVIDER"),
+    getBookingAvailableServices
+);
 
 export default router;
 

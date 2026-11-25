@@ -1,7 +1,8 @@
 import {
   getAllBookings,
   createBooking as createBookingService,
-  updateBookingStatus as updateBookingStatusService
+  updateBookingStatus as updateBookingStatusService,
+  getAvailableServices
 } from "./booking.service.js";
 
 export const getBookings = async (req, res) => {
@@ -104,4 +105,23 @@ export const updateBookingStatus = async(req, res) =>{
       : "Failed to update booking status"
     });
   }
+};
+
+
+export const getBookingAvailableServices = async (req, res) => {
+    try {
+        const services = await getAvailableServices(req.user.id);
+
+        return res.status(200).json({
+            success: true,
+            services
+        });
+    } catch (error) {
+        return res.status(error.statusCode || 500).json({
+            success: false,
+            message: error.statusCode
+                ? error.message
+                : "Failed to retrieve available services"
+        });
+    }
 };

@@ -3,8 +3,6 @@ import { getProviderById, createProvider, updateProvider, getProviders } from ".
 import { createService, getServices, updateService, deleteService } from "./providerService.controller.js";
 import { protect, authorizeRoles } from "../profiles/auth.middleware.js";
 
-import { protect, authorizeRoles } from "../profiles/auth.middleware.js";
-
 const router = Router();
 
 // router.get("/", getProviders);

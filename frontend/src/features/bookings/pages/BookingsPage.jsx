@@ -214,17 +214,20 @@
 import { useState, useEffect } from "react";
 import {
   getBookings,
-  updateBookingStatus,
-  getCurrentUser
+  updateBookingStatus
 
 } from "../services/bookingServices.js";
+
+import { useAuth } from "../../../context/AuthContext";
 
 export default function BookingsPage() {
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [updatingId, setUpdatingId] = useState(null);
-  const [currentUser, setCurrentUser] = useState(null);
+  // const [currentUser, setCurrentUser] = useState(null);
+  // const [currentUser, setCurrentUser] = useState(null);
+  const { user: currentUser } = useAuth();
 
   useEffect(() => {
     async function loadBookings() {
@@ -242,19 +245,19 @@ export default function BookingsPage() {
     loadBookings();
   }, []);
 
-  useEffect(() => {
-    async function loadCurrentUser() {
-        try {
-            const user = await getCurrentUser();
-            setCurrentUser(user);
-        } catch (err) {
-            setCurrentUser(null);
-            console.error("Failed to retrieve current user:", err);
-        }
-    }
+//   useEffect(() => {
+//     async function loadCurrentUser() {
+//         try {
+//             const user = await getCurrentUser();
+//             setCurrentUser(user);
+//         } catch (err) {
+//             setCurrentUser(null);
+//             console.error("Failed to retrieve current user:", err);
+//         }
+//     }
 
-    loadCurrentUser();
-}, []);
+//     loadCurrentUser();
+// }, []);
 
   async function handleBookingDecision(bookingId, status) {
     const action = status === "ACCEPTED" ? "accept" : "reject";

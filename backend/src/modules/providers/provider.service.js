@@ -30,14 +30,21 @@ export async function createProviderProfile(userId, data) {
   if (existingProvider) {
     return { status: "already_exists" };
   }
-  const newProvider = await db.orm.public.ProviderProfile.create({
-    data: {
+  // const newProvider = await db.orm.public.ProviderProfile.create({
+  //   data: {
+  //     userId: userId,
+  //     businessName: data.businessName,
+  //     description: data.description,
+  //     location: data.location,
+  //     websiteUrl: data.websiteUrl,
+  //   },
+  // });
+    const newProvider = await db.orm.public.ProviderProfile.create({
       userId: userId,
       businessName: data.businessName,
       description: data.description,
       location: data.location,
       websiteUrl: data.websiteUrl,
-    },
   });
   return { status: "success", provider: newProvider };
 }

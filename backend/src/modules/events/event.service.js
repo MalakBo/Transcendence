@@ -1,4 +1,4 @@
-import { use } from "react";
+
 import { db } from "../../prisma/db.ts";
 
 export const createEventService = async (data, Id) => {

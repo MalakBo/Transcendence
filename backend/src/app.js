@@ -4,6 +4,8 @@ import bookingRoutes from "./modules/bookings/booking.routes.js";
 import cors from "cors";
 // Think of app as the central object that organizes your backend's HTTP behavior.
 import authRoutes from "./modules/auth/auth.routes.js"
+
+
 import providerAreaRoutes from "./modules/profiles/provider.routes.js";
 import providerRoutes from "./modules/providers/provider.routes.js";
 import organiserRoutes from "./modules/profiles/organiser.routes.js";
@@ -45,6 +47,7 @@ app.use("/auth", authRoutes);
 app.use("/api/providers", providerRoutes);
 app.use("/provider-area", providerAreaRoutes);
 app.use("/organiser", organiserRoutes);
+
 
 
 export default app;

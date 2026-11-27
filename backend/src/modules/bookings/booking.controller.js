@@ -1,29 +1,39 @@
 import {
   getAllBookings,
-  createBooking as createBookingService
+  createBooking as createBookingService,
+  updateBookingStatus as updateBookingStatusService,
+  getAvailableServices
 } from "./booking.service.js";
 
 export const getBookings = async (req, res) => {
-  try {
-    const bookings = await getAllBookings();
+  try 
+  {
+    const bookings = await getAllBookings(
+      req.user.id,
+      req.user.role
+    );
 
     return res.status(200).json({
       success: true,
       bookings
     });
-  } catch (error) {
+  } catch (error) 
+  {
     console.error("Error fetching bookings:", error);
 
-    return res.status(500).json({
-      success: false,
-      message: "Failed to fetch bookings"
+    return res.status(error.statusCode || 500).json({
+        success: false,
+        message: error.statusCode
+            ? error.message
+            : "Failed to retrieve bookings"
     });
   }
 };
 
 export const createBooking = async (req, res) => {
-  try {
-    const { eventId, providerServiceId, organizerMessage } = req.body;
+  try 
+  {
+    const { eventId, providerServiceId, providerMessage } = req.body;
     if (!eventId || !providerServiceId) {
   return res.status(400).json({
     success: false,
@@ -34,7 +44,8 @@ export const createBooking = async (req, res) => {
     const booking = await createBookingService(
       eventId,
       providerServiceId,
-      organizerMessage
+      providerMessage,
+      req.user.id
     );
 
     return res.status(201).json({
@@ -42,7 +53,8 @@ export const createBooking = async (req, res) => {
       message: "Booking created successfully",
       booking
     });
-  } catch (error) {
+  } catch (error) 
+  {
     console.error("Error creating booking:", error);
 
     return res.status(error.statusCode || 500).json({
@@ -57,4 +69,59 @@ export const createBooking = async (req, res) => {
     //   message: "Failed to create booking"
     // });
   }
+};
+
+export const updateBookingStatus = async(req, res) =>{
+  try
+  {
+    const bookingId = req.params.id;
+    const {status, organizerMessage } = req.body;
+    
+    if(!["ACCEPTED", "REJECTED"].includes(status)){
+      return res.status(400).json({
+        success: false,
+        message: "Status must be ACCEPTED or REJECTED"
+      });
+    }
+    const booking = await updateBookingStatusService(
+      bookingId,
+      status,
+      organizerMessage,
+      req.user.id
+    );
+    return res.status(200).json({
+      success: true,
+      message: "Booking status updated successfully",
+      booking
+    });
+  }catch (error)
+  {
+    console.error("Error updating booking status:", error);
+
+    return res.status(error.statusCode || 500).json({
+      success: false,
+      message: error.statusCode
+      ? error.message
+      : "Failed to update booking status"
+    });
+  }
+};
+
+
+export const getBookingAvailableServices = async (req, res) => {
+    try {
+        const services = await getAvailableServices(req.user.id);
+
+        return res.status(200).json({
+            success: true,
+            services
+        });
+    } catch (error) {
+        return res.status(error.statusCode || 500).json({
+            success: false,
+            message: error.statusCode
+                ? error.message
+                : "Failed to retrieve available services"
+        });
+    }
 };

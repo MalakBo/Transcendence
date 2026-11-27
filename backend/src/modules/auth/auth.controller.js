@@ -110,7 +110,6 @@ const logout = async (req, res) => {
 };
 
 /* me */
-/* me */
 const me = async (req, res) => {
   const token = req.cookies.jwt;
 

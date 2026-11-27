@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect } from "react";
-import { apiRequest } from "../services/api.js";
+import * as authService from "../services/authService.js";
 
 const AuthContext = createContext(null);
 
@@ -10,7 +10,7 @@ export function AuthProvider({ children }) {
     useEffect(() => {
         async function checkAuth() {
             try {
-                const response = await apiRequest("/auth/me");
+                const response = await authService.getMe();
                 setUser(response.data.user);
             } catch (error) {
                 setUser(null);
@@ -22,8 +22,25 @@ export function AuthProvider({ children }) {
         checkAuth();
     }, []);
 
+    async function login(credentials) {
+        const response = await authService.login(credentials);
+        setUser(response.data.user);
+        return response;
+    }
+
+    async function signup(data) {
+        const response = await authService.register(data);
+        setUser(response.data.user);
+        return response;
+    }
+
+    async function logout() {
+        await authService.logout();
+        setUser(null);
+    }
+
     return (
-        <AuthContext.Provider value={{ user, setUser, loading }}>
+        <AuthContext.Provider value={{ user, setUser, loading, login, signup, logout }}>
             {children}
         </AuthContext.Provider>
     );

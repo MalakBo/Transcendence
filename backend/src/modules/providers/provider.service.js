@@ -3,14 +3,7 @@ import { and } from "@prisma/orm-postgres/orm-client";
 
 export async function findProviderById(id) {
   const provider = await db.orm.public.ProviderProfile.where({ id })
-    .select(
-      "id",
-      "businessName",
-      "description",
-      "location",
-      "websiteUrl",
-      "verified",
-    )
+    .select("id", "userId", "businessName", "description", "location", "websiteUrl", "verified")
     .first();
   return provider;
 }

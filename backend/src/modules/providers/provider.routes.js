@@ -8,12 +8,12 @@ router.get("/", getProviders);
 router.get("/categories", getCategories);
 router.get("/:id", getProviderById);
 router.post("/", protect, authorizeRoles("PROVIDER"), createProvider);
-router.patch("/:id", protect, updateProvider);
+router.patch("/:id", protect, authorizeRoles("PROVIDER"), updateProvider);
 
 // provider services routes
-router.post("/:providerId/services", protect, createService);
+router.post("/:providerId/services", protect, authorizeRoles("PROVIDER"), createService);
 router.get("/:providerId/services", getServices);
-router.patch("/:providerId/services/:serviceId", protect, updateService);
-router.delete("/:providerId/services/:serviceId", protect, deleteService);
+router.patch("/:providerId/services/:serviceId", protect, authorizeRoles("PROVIDER"), updateService);
+router.delete("/:providerId/services/:serviceId", protect, authorizeRoles("PROVIDER"), deleteService);
 
 export default router;

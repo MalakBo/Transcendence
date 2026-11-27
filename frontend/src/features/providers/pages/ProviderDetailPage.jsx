@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { ArrowLeft, MapPin, Globe, BadgeCheck } from "lucide-react";
 import { apiRequest } from "../../../services/api";
+import ProviderServiceForm from "../components/ProviderServiceForm";
 
 export default function ProviderDetailPage() {
     const { id } = useParams();
@@ -10,7 +11,23 @@ export default function ProviderDetailPage() {
     const [services, setServices] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
+    const [currentUser, setCurrentUser] = useState(null);
+    const [editingService, setEditingService] = useState(null);
+    const [deletingServiceId, setDeletingServiceId] = useState(null);
+    const [deleteError, setDeleteError] = useState("");
 
+    useEffect(() => {
+    async function loadCurrentUser() {
+        try {
+            const response = await apiRequest("/auth/me");
+            setCurrentUser(response.user);
+        } catch {
+            setCurrentUser(null);
+        }
+    }
+
+    loadCurrentUser();
+}, []);
     useEffect(() => {
         let cancelled = false;
         async function loadProvider() {
@@ -42,7 +59,33 @@ export default function ProviderDetailPage() {
             cancelled = true;
         };
     }, [id]);
-
+    const isOwner =
+        currentUser?.role === "PROVIDER" &&
+        currentUser?.id === provider?.userId;
+    async function handleDeleteService(serviceId) {
+        if(!isOwner || deletingServiceId) 
+            return;
+        const confirmed = window.confirm("Are you sure you want to delete this service?");
+        if(!confirmed)
+            return;
+        setDeletingServiceId(serviceId);
+        setDeleteError("");
+        try {
+            await apiRequest(`/api/providers/${id}/services/${serviceId}`,{
+                method: "DELETE",
+            });
+            setServices((previous) =>
+                previous.filter((service) => service.id !== serviceId)
+            );
+            if(editingService?.id === serviceId) {
+                setEditingService(null);
+            }
+        } catch (err) {
+            setDeleteError(err.message || "Failed to delete service.");
+        } finally {
+            setDeletingServiceId(null);
+        }
+    }
     return (
         <main className="!block min-h-screen bg-white px-5 py-10 sm:px-8">
             <div className="mx-auto max-w-5xl">
@@ -102,25 +145,93 @@ export default function ProviderDetailPage() {
                                         {provider.description || "This provider hasn't added a description yet. "}
                                     </p>
                                 </section>
+                                {isOwner && (
+                                    <section className="rounded-2xl border border-neutral-200 p-7">
+                                        <ProviderServiceForm
+                                            providerId={id}
+                                            serviceToEdit={editingService}
+                                            onServiceCreated={(newService) => {
+                                                setServices((previous) => [...previous, newService]);
+                                            }}
+                                            onServiceUpdated={(updatedService) => {
+                                                setServices((previous) =>
+                                                    previous.map((service) =>
+                                                        service.id === updatedService.id
+                                                            ? { ...service, ...updatedService }
+                                                            : service
+                                                    )
+                                                );
+                                                setEditingService(null);
+                                            }}
+                                            onCancel={() => setEditingService(null)}
+                                        />
+                                    </section>
+                                )}
                                 <section className="rounded-2xl border border-neutral-200 p-7">
                                     <div className="mb-5 flex items-center justify-between">
-                                        <h2 className="text-xl font-semibold text-neutral-950">Services</h2>
-                                        <span className="text-sm text-neutral-500">{services.length} available</span>
+                                        <h2 className="text-xl font-semibold text-neutral-950">
+                                            Services
+                                        </h2>
+                                        <span className="text-sm text-neutral-500">
+                                            {services.length} available
+                                        </span>
                                     </div>
+
+                                    {deleteError && (
+                                        <p role="alert" className="mb-4 text-sm text-red-600">
+                                            {deleteError}
+                                        </p>
+                                    )}
+
                                     {services.length === 0 ? (
-                                        <p className="text-neutral-500">No services listed yet.</p>
+                                        <p className="text-neutral-500">
+                                            No services listed yet.
+                                        </p>
                                     ) : (
                                         <div className="space-y-3">
                                             {services.map((service) => (
-                                                <div key={service.id} className="rounded-xl border border-neutral-200 bg-neutral-50 p-5">
+                                                <div
+                                                    key={service.id}
+                                                    className="rounded-xl border border-neutral-200 bg-neutral-50 p-5"
+                                                >
                                                     <h3 className="font-semibold text-neutral-950">
                                                         {service.name || service.title || "Service"}
                                                     </h3>
+                                            
                                                     {service.description && (
-                                                        <p className="mt-2 text-sm leading-6 text-neutral-600">{service.description}</p>
+                                                        <p className="mt-2 text-sm leading-6 text-neutral-600">
+                                                            {service.description}
+                                                        </p>
                                                     )}
+
                                                     {service.price != null && (
-                                                        <p className="mt-3 text-sm font-semibold text-neutral-950">{service.price} MAD</p>
+                                                        <p className="mt-3 text-sm font-semibold text-neutral-950">
+                                                            {service.price} MAD
+                                                        </p>
+                                                    )}
+
+                                                    {isOwner && (
+                                                        <div className="mt-4 flex items-center gap-3">
+                                                            <button
+                                                                type="button"
+                                                                onClick={() => setEditingService(service)}
+                                                                disabled={deletingServiceId !== null}
+                                                                className="rounded-lg border border-neutral-300 px-4 py-2 text-sm font-medium hover:bg-neutral-100 disabled:opacity-50"
+                                                            >
+                                                                Edit
+                                                            </button>
+                                                    
+                                                            <button
+                                                                type="button"
+                                                                onClick={() => handleDeleteService(service.id)}
+                                                                disabled={deletingServiceId !== null}
+                                                                className="rounded-lg border border-red-200 px-4 py-2 text-sm font-medium text-red-600 hover:bg-red-50 disabled:opacity-50"
+                                                            >
+                                                                {deletingServiceId === service.id
+                                                                    ? "Deleting..."
+                                                                    : "Delete"}
+                                                            </button>
+                                                        </div>
                                                     )}
                                                 </div>
                                             ))}

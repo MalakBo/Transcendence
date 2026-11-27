@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 import { db } from "../../prisma/db.ts";
+=======
+import { db } from "./src/prisma/db.ts";
+>>>>>>> 1c629c81ac53c782da175bb150fe5dd0609a356d
 
 export async function createConversationForUsers(userAId, userBId)
 {   

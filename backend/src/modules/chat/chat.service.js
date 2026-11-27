@@ -1,74 +1,70 @@
-<<<<<<< HEAD
 import { db } from "../../prisma/db.ts";
-=======
-import { db } from "./src/prisma/db.ts";
->>>>>>> 1c629c81ac53c782da175bb150fe5dd0609a356d
 
-export async function createConversationForUsers(userAId, userBId)
-{   
-    if (userAId === userBId)
-        throw Error("cannot chat with yourself")
-    const [userLowId, userHighId] =
+const Conversations = db.orm.public.Conversation;
+const Messages = db.orm.public.Message;
+const Users = db.orm.public.User;
+
+const time = (v) => (v instanceof Date ? v.getTime() : new Date(String(v)).getTime());
+
+export async function createConversationForUsers(userAId, userBId) {
+  if (userAId === userBId) throw new Error("cannot chat with yourself");
+  const [userLowId, userHighId] =
     userAId < userBId ? [userAId, userBId] : [userBId, userAId];
-    const existing = await db.conversation.findFirst({ where: { userLowId, userHighId } });
-    if (existing)
-        return existing;
-    return await db.conversation.create({ data: { userLowId, userHighId } });
-};
 
-export async function getForMember(conversationId, userId)
-{
-    const conversation = await db.conversation.findUnique({where : { id : conversationId}});
-    if (!conversation)
-        return null;
-    if (userId !==  conversation.userHighId && userId !==  conversation.userLowId)
-        return null;
-    return conversation;
+  const existing = await Conversations.where({ userLowId, userHighId }).first();
+  if (existing) return existing;
+  return Conversations.create({ userLowId, userHighId });
 }
 
-export async function listMessages(conversationId, userId)
-{
-    const conversation = await getForMember(conversationId, userId);
-    if (!conversation)
-        throw new Error("forbidden");
-    return db.message.findMany({where: { conversationId }, orderBy: { createdAt: "asc" },});
+export async function getForMember(conversationId, userId) {
+  const conversation = await Conversations.where({ id: conversationId }).first();
+  if (!conversation) return null;
+  if (userId !== conversation.userHighId && userId !== conversation.userLowId)
+    return null;
+  return conversation;
 }
 
-export async function saveMessage(conversationId, userId, content)
-{
-    const conversation = await getForMember(conversationId, userId);
-    if (!conversation)
-        throw new Error("forbidden");
-    if (!content || !content.trim()) throw new Error("empty message");
-    const message = await db.message.create({ data: { conversationId, senderId: userId, content } });
-
-    await db.conversation.update({ where: { id: conversationId }, data: { updatedAt: new Date() },});
-    return message;
-
+export async function listMessages(conversationId, userId) {
+  if (!(await getForMember(conversationId, userId))) throw new Error("forbidden");
+  const rows = await Messages.where({ conversationId }).all();
+  return rows.sort((a, b) => time(a.createdAt) - time(b.createdAt));
 }
 
-///error 
-export async function listConversations(userId)
-{
-  const rows = await db.conversation.findMany({
-    where: { OR: [{ userLowId: userId }, { userHighId: userId }] },
-    orderBy: { updatedAt: "desc" },
-    include: { messages: { orderBy: { createdAt: "desc" }, take: 1 } },
+export async function saveMessage(conversationId, userId, content) {
+  if (!(await getForMember(conversationId, userId))) throw new Error("forbidden");
+  if (!content || !content.trim()) throw new Error("empty message");
+  return Messages.create({
+    conversationId,
+    senderId: userId,
+    content: content.trim(),
   });
+}
 
-  const otherIds = rows.map((c) =>
-    c.userLowId === userId ? c.userHighId : c.userLowId
+export async function listConversations(userId) {
+  const [asLow, asHigh] = await Promise.all([
+    Conversations.where({ userLowId: userId }).all(),
+    Conversations.where({ userHighId: userId }).all(),
+  ]);
+  const rows = [...asLow, ...asHigh];
+
+  const items = await Promise.all(
+    rows.map(async (c) => {
+      const otherId = c.userLowId === userId ? c.userHighId : c.userLowId;
+      const [other, messages] = await Promise.all([
+        Users.where({ id: otherId }).select("id", "name", "avatarUrl").first(),
+        Messages.where({ conversationId: c.id }).all(),
+      ]);
+      const last = messages.sort((a, b) => time(b.createdAt) - time(a.createdAt))[0];
+      return {
+        id: c.id,
+        with: other,
+        lastMessage: last ?? null,
+        sortTime: time(last ? last.createdAt : c.createdAt),
+      };
+    })
   );
 
-  const users = await db.user.findMany({
-    where: { id: { in: otherIds } },
-    select: { id: true, name: true, avatarUrl: true },
-  });
-  const byId = new Map(users.map((u) => [u.id, u]));
-
-  return rows.map((c, i) => ({
-    id: c.id,
-    with: byId.get(otherIds[i]),
-    lastMessage: c.messages.length ? c.messages[0] : null,
-  }));
+  return items
+    .sort((a, b) => b.sortTime - a.sortTime)
+    .map(({ sortTime, ...item }) => item);
 }

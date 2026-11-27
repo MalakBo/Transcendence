@@ -5,6 +5,8 @@ import cors from "cors";
 // Think of app as the central object that organizes your backend's HTTP behavior.
 import authRoutes from "./modules/auth/auth.routes.js"
 
+//chat
+import chatRoutes from "./modules/chat/chat.routes.js";
 
 import providerAreaRoutes from "./modules/profiles/provider.routes.js";
 import providerRoutes from "./modules/providers/provider.routes.js";
@@ -30,6 +32,10 @@ app.use("/api/bookings", bookingRoutes);
 
 // by faty
 app.use("/api/events", eventRoutes);
+
+
+///chat
+app.use("/api/chat", chatRoutes);
 
 // Test route
 app.get("/api/health", (req, res) => {

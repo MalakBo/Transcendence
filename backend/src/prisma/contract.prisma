@@ -256,7 +256,6 @@ model Booking {
   updatedAt temporal.updatedAt()
 
   // Relations
-  conversation Conversation?
   review       Review?
 
   @@index([eventId])

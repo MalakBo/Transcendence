@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect } from "react";
 import { apiRequest } from "../services/api.js";
+import { socket } from "../features/chat/services/chatSocket.js";
 
 const AuthContext = createContext(null);
 
@@ -21,6 +22,20 @@ export function AuthProvider({ children }) {
 
         checkAuth();
     }, []);
+
+    useEffect(() => {
+    if (loading) return;
+
+    if (user) {
+        socket.connect();
+    } else {
+        socket.disconnect();
+    }
+
+    return () => {
+        socket.disconnect();
+    };
+    }, [user, loading]);
 
     return (
         <AuthContext.Provider value={{ user, setUser, loading }}>

@@ -23,7 +23,7 @@ wait-db:
 	@echo "PostgreSQL is ready!"
 
 down:
-	docker compose down -v
+	docker compose down
 
 restart:
 	docker compose down
@@ -50,9 +50,13 @@ db-status:
 	docker compose run --rm backend npx prisma migration status
 
 db-migrate:
+	docker compose up -d database
 	docker compose run --rm backend npx prisma db init
 
 db-init: db-emit db-migrate
+
+test:
+	docker compose exec backend node --test tests/auth.e2e.test.js
 
 db-shell:
 	docker compose exec database sh -c 'psql -U "$$POSTGRES_USER" -d "$$POSTGRES_NAME"'

@@ -1,6 +1,6 @@
 #!/usr/bin/env -S node
-import type { Contract as End } from '../../snapshots/a3b258464fbec7990baf8c55ef7864b4663cf278ac29e964da7260964ef8abea/contract';
-import endContract from '../../snapshots/a3b258464fbec7990baf8c55ef7864b4663cf278ac29e964da7260964ef8abea/contract.json' with { type: 'json' };
+import type { Contract as End } from '../../snapshots/22a33fad166540f47d9117be4d78ffb07300eb0b66097015a321a580f6624ee3/contract';
+import endContract from '../../snapshots/22a33fad166540f47d9117be4d78ffb07300eb0b66097015a321a580f6624ee3/contract.json' with { type: 'json' };
 import {
   Migration,
   MigrationCLI,
@@ -127,6 +127,36 @@ export default class M extends Migration<never, End> {
           }),
         ],
         constraints: [primaryKey(['id'])],
+      }),
+      this.createTable({
+        schema: 'public',
+        table: 'Friendship',
+        columns: [
+          col('addresseeId', 'text', { notNull: true, codecRef: { codecId: 'pg/text@1' } }),
+          col('createdAt', 'timestamptz', {
+            notNull: true,
+            default: fn('now()'),
+            codecRef: { codecId: 'pg/timestamptz-temporal@1' },
+          }),
+          col('id', 'text', { notNull: true, codecRef: { codecId: 'pg/text@1' } }),
+          col('requesterId', 'text', { notNull: true, codecRef: { codecId: 'pg/text@1' } }),
+          col('status', 'text', {
+            notNull: true,
+            default: lit('PENDING'),
+            codecRef: { codecId: 'pg/text@1' },
+          }),
+          col('updatedAt', 'timestamptz', {
+            notNull: true,
+            codecRef: { codecId: 'pg/timestamptz-temporal@1' },
+          }),
+        ],
+        constraints: [
+          primaryKey(['id']),
+          checkExpression(
+            'Friendship_status_check_f0e5c74c',
+            "\"status\" IN ('PENDING', 'ACCEPTED')",
+          ),
+        ],
       }),
       this.createTable({
         schema: 'public',
@@ -300,15 +330,14 @@ export default class M extends Migration<never, End> {
             codecRef: { codecId: 'pg/timestamptz-temporal@1' },
           }),
           col('email', 'text', { notNull: true, codecRef: { codecId: 'pg/text@1' } }),
-          col('firstName', 'text', { notNull: true, codecRef: { codecId: 'pg/text@1' } }),
           col('id', 'text', { notNull: true, codecRef: { codecId: 'pg/text@1' } }),
           col('isActive', 'bool', {
             notNull: true,
             default: lit(true),
             codecRef: { codecId: 'pg/bool@1' },
           }),
-          col('lastName', 'text', { notNull: true, codecRef: { codecId: 'pg/text@1' } }),
-          col('passwordHash', 'text', { notNull: true, codecRef: { codecId: 'pg/text@1' } }),
+          col('name', 'text', { notNull: true, codecRef: { codecId: 'pg/text@1' } }),
+          col('password', 'text', { notNull: true, codecRef: { codecId: 'pg/text@1' } }),
           col('phone', 'text', { codecRef: { codecId: 'pg/text@1' } }),
           col('role', 'text', { notNull: true, codecRef: { codecId: 'pg/text@1' } }),
           col('updatedAt', 'timestamptz', {
@@ -335,6 +364,12 @@ export default class M extends Migration<never, End> {
         table: 'EventRequiredService',
         constraint: 'EventRequiredService_eventId_categoryId_key',
         columns: ['eventId', 'categoryId'],
+      }),
+      this.addUnique({
+        schema: 'public',
+        table: 'Friendship',
+        constraint: 'Friendship_requesterId_addresseeId_key',
+        columns: ['requesterId', 'addresseeId'],
       }),
       this.addUnique({
         schema: 'public',
@@ -395,6 +430,30 @@ export default class M extends Migration<never, End> {
         table: 'EventRequiredService',
         index: 'EventRequiredService_eventId_idx_6a266d47',
         columns: ['eventId'],
+      }),
+      this.createIndex({
+        schema: 'public',
+        table: 'Friendship',
+        index: 'Friendship_addresseeId_idx_d745efab',
+        columns: ['addresseeId'],
+      }),
+      this.createIndex({
+        schema: 'public',
+        table: 'Friendship',
+        index: 'Friendship_addresseeId_status_idx_d22a50cb',
+        columns: ['addresseeId', 'status'],
+      }),
+      this.createIndex({
+        schema: 'public',
+        table: 'Friendship',
+        index: 'Friendship_requesterId_idx_a5f4af92',
+        columns: ['requesterId'],
+      }),
+      this.createIndex({
+        schema: 'public',
+        table: 'Friendship',
+        index: 'Friendship_requesterId_status_idx_d3ddea37',
+        columns: ['requesterId', 'status'],
       }),
       this.createIndex({
         schema: 'public',
@@ -506,6 +565,26 @@ export default class M extends Migration<never, End> {
           name: 'EventRequiredService_categoryId_fkey',
           columns: ['categoryId'],
           references: { schema: 'public', table: 'ServiceCategory', columns: ['id'] },
+        },
+      }),
+      this.addForeignKey({
+        schema: 'public',
+        table: 'Friendship',
+        foreignKey: {
+          name: 'Friendship_requesterId_fkey',
+          columns: ['requesterId'],
+          references: { schema: 'public', table: 'User', columns: ['id'] },
+          onDelete: 'cascade',
+        },
+      }),
+      this.addForeignKey({
+        schema: 'public',
+        table: 'Friendship',
+        foreignKey: {
+          name: 'Friendship_addresseeId_fkey',
+          columns: ['addresseeId'],
+          references: { schema: 'public', table: 'User', columns: ['id'] },
+          onDelete: 'cascade',
         },
       }),
       this.addForeignKey({

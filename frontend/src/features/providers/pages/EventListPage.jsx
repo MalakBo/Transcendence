@@ -3,6 +3,7 @@ import EventCard from '../components/EventCard';
 import { apiRequest } from '../../../services/api';
 import ProviderSearchBar from '../components/ProviderSearchBar';
 import ProviderFilters from '../components/ProviderFilters';
+import { Logout } from '../../auth/components/logout/Logout';
 
 export default function EventListPage() {
     const [events, setEvents] = useState([]);
@@ -27,7 +28,7 @@ export default function EventListPage() {
                     setEvents(response);
                 }
             } catch (err) {
-                if(!cancelled) 
+                if(!cancelled)
                 {
                     setError(err.message || "Failed to load events.");
                 }
@@ -80,6 +81,7 @@ function clearFilters() {
 }
 return (
   <main className="!block min-h-screen bg-white px-5 py-12 sm:px-8">
+    <Logout> </Logout>
     <div className="mx-auto w-full max-w-6xl">
         <section className="relative mb-4 overflow-hidden rounded-3xl bg-neutral-950 px-6 py-3 text-white sm:px-8 sm:py-4">
             <div className="pointer-events-none absolute -right-16 -top-20 h-72 w-72 rounded-full border border-white/15" />

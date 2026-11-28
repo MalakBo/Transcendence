@@ -173,6 +173,45 @@
     ]
   },
   {
+    "id": "table.Friendship",
+    "label": "Create table \"Friendship\"",
+    "summary": "Creates table \"Friendship\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "Friendship"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"Friendship\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"Friendship\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"Friendship\"",
+        "sql": "CREATE TABLE \"public\".\"Friendship\" (\n  \"addresseeId\" text NOT NULL,\n  \"createdAt\" timestamptz DEFAULT (now()) NOT NULL,\n  \"id\" text NOT NULL,\n  \"requesterId\" text NOT NULL,\n  \"status\" text DEFAULT 'PENDING' NOT NULL,\n  \"updatedAt\" timestamptz NOT NULL,\n  PRIMARY KEY (\"id\"),\n  CONSTRAINT \"Friendship_status_check_f0e5c74c\" CHECK (\"status\" IN ('PENDING', 'ACCEPTED'))\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"Friendship\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"Friendship\""
+        ]
+      }
+    ]
+  },
+  {
     "id": "table.Message",
     "label": "Create table \"Message\"",
     "summary": "Creates table \"Message\"",
@@ -431,7 +470,7 @@
     "execute": [
       {
         "description": "create table \"User\"",
-        "sql": "CREATE TABLE \"public\".\"User\" (\n  \"avatarUrl\" text,\n  \"createdAt\" timestamptz DEFAULT (now()) NOT NULL,\n  \"email\" text NOT NULL,\n  \"firstName\" text NOT NULL,\n  \"id\" text NOT NULL,\n  \"isActive\" bool DEFAULT true NOT NULL,\n  \"lastName\" text NOT NULL,\n  \"passwordHash\" text NOT NULL,\n  \"phone\" text,\n  \"role\" text NOT NULL,\n  \"updatedAt\" timestamptz NOT NULL,\n  PRIMARY KEY (\"id\"),\n  CONSTRAINT \"User_role_check_02e3aac1\" CHECK (\"role\" IN ('ORGANIZER', 'PROVIDER', 'ADMIN'))\n)",
+        "sql": "CREATE TABLE \"public\".\"User\" (\n  \"avatarUrl\" text,\n  \"createdAt\" timestamptz DEFAULT (now()) NOT NULL,\n  \"email\" text NOT NULL,\n  \"id\" text NOT NULL,\n  \"isActive\" bool DEFAULT true NOT NULL,\n  \"name\" text NOT NULL,\n  \"password\" text NOT NULL,\n  \"phone\" text,\n  \"role\" text NOT NULL,\n  \"updatedAt\" timestamptz NOT NULL,\n  PRIMARY KEY (\"id\"),\n  CONSTRAINT \"User_role_check_02e3aac1\" CHECK (\"role\" IN ('ORGANIZER', 'PROVIDER', 'ADMIN'))\n)",
         "params": []
       }
     ],
@@ -525,6 +564,48 @@
           "EventRequiredService_eventId_categoryId_key",
           "public",
           "\"public\".\"EventRequiredService\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "unique.Friendship.Friendship_requesterId_addresseeId_key",
+    "label": "Add unique constraint on \"Friendship\" (requesterId, addresseeId)",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "unique",
+        "name": "Friendship_requesterId_addresseeId_key",
+        "table": "Friendship"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"Friendship_requesterId_addresseeId_key\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "Friendship_requesterId_addresseeId_key",
+          "public",
+          "\"public\".\"Friendship\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add unique constraint \"Friendship_requesterId_addresseeId_key\"",
+        "sql": "ALTER TABLE \"public\".\"Friendship\" ADD CONSTRAINT \"Friendship_requesterId_addresseeId_key\" UNIQUE (\"requesterId\", \"addresseeId\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"Friendship_requesterId_addresseeId_key\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "Friendship_requesterId_addresseeId_key",
+          "public",
+          "\"public\".\"Friendship\""
         ]
       }
     ]
@@ -927,6 +1008,162 @@
         "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
         "params": [
           "\"public\".\"EventRequiredService_eventId_idx_6a266d47\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.Friendship.Friendship_addresseeId_idx_d745efab",
+    "label": "Create index \"Friendship_addresseeId_idx_d745efab\" on \"Friendship\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "Friendship_addresseeId_idx_d745efab",
+        "table": "Friendship"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"Friendship_addresseeId_idx_d745efab\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"Friendship_addresseeId_idx_d745efab\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"Friendship_addresseeId_idx_d745efab\"",
+        "sql": "CREATE INDEX \"Friendship_addresseeId_idx_d745efab\" ON \"public\".\"Friendship\" (\"addresseeId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"Friendship_addresseeId_idx_d745efab\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"Friendship_addresseeId_idx_d745efab\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.Friendship.Friendship_addresseeId_status_idx_d22a50cb",
+    "label": "Create index \"Friendship_addresseeId_status_idx_d22a50cb\" on \"Friendship\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "Friendship_addresseeId_status_idx_d22a50cb",
+        "table": "Friendship"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"Friendship_addresseeId_status_idx_d22a50cb\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"Friendship_addresseeId_status_idx_d22a50cb\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"Friendship_addresseeId_status_idx_d22a50cb\"",
+        "sql": "CREATE INDEX \"Friendship_addresseeId_status_idx_d22a50cb\" ON \"public\".\"Friendship\" (\"addresseeId\", \"status\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"Friendship_addresseeId_status_idx_d22a50cb\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"Friendship_addresseeId_status_idx_d22a50cb\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.Friendship.Friendship_requesterId_idx_a5f4af92",
+    "label": "Create index \"Friendship_requesterId_idx_a5f4af92\" on \"Friendship\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "Friendship_requesterId_idx_a5f4af92",
+        "table": "Friendship"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"Friendship_requesterId_idx_a5f4af92\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"Friendship_requesterId_idx_a5f4af92\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"Friendship_requesterId_idx_a5f4af92\"",
+        "sql": "CREATE INDEX \"Friendship_requesterId_idx_a5f4af92\" ON \"public\".\"Friendship\" (\"requesterId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"Friendship_requesterId_idx_a5f4af92\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"Friendship_requesterId_idx_a5f4af92\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.Friendship.Friendship_requesterId_status_idx_d3ddea37",
+    "label": "Create index \"Friendship_requesterId_status_idx_d3ddea37\" on \"Friendship\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "Friendship_requesterId_status_idx_d3ddea37",
+        "table": "Friendship"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"Friendship_requesterId_status_idx_d3ddea37\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"Friendship_requesterId_status_idx_d3ddea37\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"Friendship_requesterId_status_idx_d3ddea37\"",
+        "sql": "CREATE INDEX \"Friendship_requesterId_status_idx_d3ddea37\" ON \"public\".\"Friendship\" (\"requesterId\", \"status\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"Friendship_requesterId_status_idx_d3ddea37\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"Friendship_requesterId_status_idx_d3ddea37\""
         ]
       }
     ]
@@ -1530,6 +1767,90 @@
           "EventRequiredService_categoryId_fkey",
           "public",
           "\"public\".\"EventRequiredService\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.Friendship.Friendship_requesterId_fkey",
+    "label": "Add foreign key \"Friendship_requesterId_fkey\" on \"Friendship\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "Friendship_requesterId_fkey",
+        "table": "Friendship"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"Friendship_requesterId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "Friendship_requesterId_fkey",
+          "public",
+          "\"public\".\"Friendship\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"Friendship_requesterId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"Friendship\"\nADD CONSTRAINT \"Friendship_requesterId_fkey\"\nFOREIGN KEY (\"requesterId\")\nREFERENCES \"public\".\"User\" (\"id\")\nON DELETE CASCADE"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"Friendship_requesterId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "Friendship_requesterId_fkey",
+          "public",
+          "\"public\".\"Friendship\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.Friendship.Friendship_addresseeId_fkey",
+    "label": "Add foreign key \"Friendship_addresseeId_fkey\" on \"Friendship\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "Friendship_addresseeId_fkey",
+        "table": "Friendship"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"Friendship_addresseeId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "Friendship_addresseeId_fkey",
+          "public",
+          "\"public\".\"Friendship\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"Friendship_addresseeId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"Friendship\"\nADD CONSTRAINT \"Friendship_addresseeId_fkey\"\nFOREIGN KEY (\"addresseeId\")\nREFERENCES \"public\".\"User\" (\"id\")\nON DELETE CASCADE"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"Friendship_addresseeId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "Friendship_addresseeId_fkey",
+          "public",
+          "\"public\".\"Friendship\""
         ]
       }
     ]

@@ -20,7 +20,11 @@ export default function ProtectedRoute({ allowedRoles }) {
     }
 
     if (allowedRoles && !allowedRoles.includes(user.role)) {
-        return <Navigate to={navigateByRole(user.role)} replace/>;
+        return <Navigate to={navigateByRole(user.role)} replace />;
     }
+
+    // if (allowedRoles && !allowedRoles.includes(user.role)) {
+    //     return <Navigate to="/notAllowed" replace />;
+    // }
     return <Outlet />;
 }

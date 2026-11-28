@@ -7,12 +7,13 @@ import { LoginForm } from "../features/auth/components/form/LoginForm";
 import { SignUp } from "../features/auth/components/form/SignUp";
 
 import ProtectedRoute from "./ProtectedRoute";
+import GuestRoute from "./GuestRoute";
 
 function Placeholder({ title }) {
     return (
         <main>
             <h1>{title}</h1>
-            <p>EventMatch — {title} module</p>
+            {/* <p>EventMatch <br/> {title} module</p> */}
         </main>
     );
 }
@@ -20,12 +21,15 @@ function Placeholder({ title }) {
 export default function App() {
     return (
         <Routes>
-            {/* Public routes */}
-            <Route path="/login" element={<LoginForm />} />
-            <Route path="/signup" element={<SignUp />} />
+            {/* Guest routes, if a user is authenticated they shouldnt have access to it */}
+            <Route element={<GuestRoute />}>
+                <Route path="/login" element={<LoginForm />} />
+                <Route path="/signup" element={<SignUp />} />
+            </Route>
 
             {/* Should be just authenticated */}
             <Route element={<ProtectedRoute/>}>
+                <Route path="/notAllowed" element={<Placeholder title="You are not allowed" />} />
                 <Route path="/bookings" element={<Placeholder title="Bookings" />} />
                 <Route path="/chat" element={<Placeholder title="Chat" />} />
             </Route>

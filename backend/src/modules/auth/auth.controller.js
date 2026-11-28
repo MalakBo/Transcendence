@@ -60,13 +60,6 @@ const register = async (req, res) => {
   sendAuthResponse(res, 200, user, token);
 };
 
-/* Login */
-// const login = async (req, res) => {
-//     console.log("I am your backend");
-
-//     console.log(req.body);
-//     res.status(200).json({ message: "Login endpoint reached!" });
-// };
 const login = async (req, res) => {
 
   const { email, password } = req.body;
@@ -125,7 +118,6 @@ const me = async (req, res) => {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     const user = await findUserById(decoded.id);
 
-    // Account deleted or disabled
     if (!user || !user.isActive) {
       return res.status(200).json({
         status: "success",
@@ -135,7 +127,6 @@ const me = async (req, res) => {
 
     return sendAuthResponse(res, 200, user, null);
   } catch (error) {
-    // Token invalid or expired
     return res.status(200).json({
       status: "success",
       data: { user: null },

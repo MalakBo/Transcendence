@@ -20,6 +20,10 @@
       "model": "EventRequiredService",
       "namespace": "public"
     },
+    "Friendship": {
+      "model": "Friendship",
+      "namespace": "public"
+    },
     "Message": {
       "model": "Message",
       "namespace": "public"
@@ -117,6 +121,19 @@
               {
                 "name": "CANCELLED",
                 "value": "CANCELLED"
+              }
+            ]
+          },
+          "FriendshipStatus": {
+            "codecId": "pg/text@1",
+            "members": [
+              {
+                "name": "PENDING",
+                "value": "PENDING"
+              },
+              {
+                "name": "ACCEPTED",
+                "value": "ACCEPTED"
               }
             ]
           },
@@ -711,6 +728,116 @@
               },
               "namespaceId": "public",
               "table": "EventRequiredService"
+            }
+          },
+          "Friendship": {
+            "fields": {
+              "addresseeId": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "createdAt": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/timestamptz-temporal@1",
+                  "kind": "scalar"
+                }
+              },
+              "id": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "requesterId": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "status": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                },
+                "valueSet": {
+                  "entityKind": "enum",
+                  "entityName": "FriendshipStatus",
+                  "namespaceId": "public",
+                  "plane": "domain"
+                }
+              },
+              "updatedAt": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/timestamptz-temporal@1",
+                  "kind": "scalar"
+                }
+              }
+            },
+            "relations": {
+              "addressee": {
+                "cardinality": "N:1",
+                "nullable": false,
+                "on": {
+                  "localFields": [
+                    "addresseeId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "User",
+                  "namespace": "public"
+                }
+              },
+              "requester": {
+                "cardinality": "N:1",
+                "nullable": false,
+                "on": {
+                  "localFields": [
+                    "requesterId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "User",
+                  "namespace": "public"
+                }
+              }
+            },
+            "storage": {
+              "fields": {
+                "addresseeId": {
+                  "column": "addresseeId"
+                },
+                "createdAt": {
+                  "column": "createdAt"
+                },
+                "id": {
+                  "column": "id"
+                },
+                "requesterId": {
+                  "column": "requesterId"
+                },
+                "status": {
+                  "column": "status"
+                },
+                "updatedAt": {
+                  "column": "updatedAt"
+                }
+              },
+              "namespaceId": "public",
+              "table": "Friendship"
             }
           },
           "Message": {
@@ -1631,6 +1758,36 @@
                   "model": "ProviderProfile",
                   "namespace": "public"
                 }
+              },
+              "receivedFriendRequests": {
+                "cardinality": "1:N",
+                "on": {
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "addresseeId"
+                  ]
+                },
+                "to": {
+                  "model": "Friendship",
+                  "namespace": "public"
+                }
+              },
+              "sentFriendRequests": {
+                "cardinality": "1:N",
+                "on": {
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "requesterId"
+                  ]
+                },
+                "to": {
+                  "model": "Friendship",
+                  "namespace": "public"
+                }
               }
             },
             "storage": {
@@ -2101,6 +2258,146 @@
                   "columns": [
                     "eventId",
                     "categoryId"
+                  ]
+                }
+              ]
+            },
+            "Friendship": {
+              "checks": [
+                {
+                  "expression": "\"status\" IN ('PENDING', 'ACCEPTED')",
+                  "name": "Friendship_status_check_f0e5c74c",
+                  "prefix": "Friendship_status_check"
+                }
+              ],
+              "columns": {
+                "addresseeId": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false
+                },
+                "createdAt": {
+                  "codecId": "pg/timestamptz-temporal@1",
+                  "default": {
+                    "expression": "now()",
+                    "kind": "function"
+                  },
+                  "nativeType": "timestamptz",
+                  "nullable": false
+                },
+                "id": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false
+                },
+                "requesterId": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false
+                },
+                "status": {
+                  "codecId": "pg/text@1",
+                  "default": {
+                    "kind": "literal",
+                    "value": "PENDING"
+                  },
+                  "nativeType": "text",
+                  "nullable": false,
+                  "valueSet": {
+                    "entityKind": "valueSet",
+                    "entityName": "FriendshipStatus",
+                    "namespaceId": "public",
+                    "plane": "storage"
+                  }
+                },
+                "updatedAt": {
+                  "codecId": "pg/timestamptz-temporal@1",
+                  "nativeType": "timestamptz",
+                  "nullable": false
+                }
+              },
+              "foreignKeys": [
+                {
+                  "onDelete": "cascade",
+                  "source": {
+                    "columns": [
+                      "requesterId"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "Friendship"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "User"
+                  }
+                },
+                {
+                  "onDelete": "cascade",
+                  "source": {
+                    "columns": [
+                      "addresseeId"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "Friendship"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "User"
+                  }
+                }
+              ],
+              "indexes": [
+                {
+                  "columns": [
+                    "addresseeId"
+                  ],
+                  "name": "Friendship_addresseeId_idx_d745efab",
+                  "prefix": "Friendship_addresseeId_idx",
+                  "unique": false
+                },
+                {
+                  "columns": [
+                    "addresseeId",
+                    "status"
+                  ],
+                  "name": "Friendship_addresseeId_status_idx_d22a50cb",
+                  "prefix": "Friendship_addresseeId_status_idx",
+                  "unique": false
+                },
+                {
+                  "columns": [
+                    "requesterId"
+                  ],
+                  "name": "Friendship_requesterId_idx_a5f4af92",
+                  "prefix": "Friendship_requesterId_idx",
+                  "unique": false
+                },
+                {
+                  "columns": [
+                    "requesterId",
+                    "status"
+                  ],
+                  "name": "Friendship_requesterId_status_idx_d3ddea37",
+                  "prefix": "Friendship_requesterId_status_idx",
+                  "unique": false
+                }
+              ],
+              "primaryKey": {
+                "columns": [
+                  "id"
+                ]
+              },
+              "uniques": [
+                {
+                  "columns": [
+                    "requesterId",
+                    "addresseeId"
                   ]
                 }
               ]
@@ -2841,6 +3138,13 @@
                 "CANCELLED"
               ]
             },
+            "FriendshipStatus": {
+              "kind": "valueSet",
+              "values": [
+                "PENDING",
+                "ACCEPTED"
+              ]
+            },
             "PricingType": {
               "kind": "valueSet",
               "values": [
@@ -2864,10 +3168,10 @@
         "kind": "postgres-schema"
       }
     },
-    "storageHash": "f406e2ea6dfb8debc580a339c44ed8c035226311d27cb7b9c10ceb9bd0ae74d7"
+    "storageHash": "22a33fad166540f47d9117be4d78ffb07300eb0b66097015a321a580f6624ee3"
   },
   "execution": {
-    "executionHash": "fd6898b6bdcc7a8d42ef4920f5c41e9234d4103bdd11c127b8228d1573e0362f",
+    "executionHash": "fad82af47290fb9a1e3270f6d3f90a786a17856f1949ce322592ba909ddca35d",
     "mutations": {
       "defaults": [
         {
@@ -2970,6 +3274,32 @@
           },
           "ref": {
             "entry": "EventRequiredService",
+            "field": "updatedAt",
+            "namespace": "public"
+          }
+        },
+        {
+          "onCreate": {
+            "id": "uuidv4",
+            "kind": "generator"
+          },
+          "ref": {
+            "entry": "Friendship",
+            "field": "id",
+            "namespace": "public"
+          }
+        },
+        {
+          "onCreate": {
+            "id": "instantNow",
+            "kind": "generator"
+          },
+          "onUpdate": {
+            "id": "instantNow",
+            "kind": "generator"
+          },
+          "ref": {
+            "entry": "Friendship",
             "field": "updatedAt",
             "namespace": "public"
           }

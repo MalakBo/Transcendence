@@ -39,6 +39,10 @@ enum BookingStatus {
   COMPLETED
 }
 
+enum FriendshipStatus {
+  PENDING
+  ACCEPTED
+}
 
 // ======================================================
 // USERS
@@ -62,6 +66,8 @@ model User {
   events           Event[]
   messages         Message[]
   organizerReviews Review[] @relation("OrganizerReviews")
+  sentFriendRequests      Friendship[] @relation("SentFriendRequests")
+  receivedFriendRequests  Friendship[] @relation("ReceivedFriendRequests")
 }
 
 
@@ -340,4 +346,25 @@ model Review {
   updatedAt temporal.updatedAt()
 
   @@index([providerId])
+}
+
+model Friendship {
+  id String @id @default(uuid())
+
+  requesterId String
+  requester   User
+    @relation("SentFriendRequests", fields: [requesterId], references: [id], onDelete: Cascade)
+
+  addresseeId String
+  addressee   User
+    @relation("ReceivedFriendRequests", fields: [addresseeId], references: [id], onDelete: Cascade)
+
+  status FriendshipStatus @default(PENDING)
+
+  createdAt DateTime @default(now())
+  updatedAt temporal.updatedAt()
+
+  @@unique([requesterId, addresseeId])
+  @@index([addresseeId, status])
+  @@index([requesterId, status])
 }
